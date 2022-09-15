@@ -1,9 +1,6 @@
 mod diagnostics;
+mod fixed_timestep;
 mod simulation;
-
-use crate::diagnostics::update_time_diagnostics_plugin::UpdateTimeDiagnosticsPlugin;
-use crate::diagnostics::SimulationDiagnosticsPlugin;
-use crate::simulation::SimulationTimer;
 
 use bevy::math::vec3;
 use bevy::prelude::*;
@@ -12,6 +9,13 @@ use bevy::window::PresentMode;
 use bevy_inspector_egui::WorldInspectorPlugin;
 use iyes_loopless::prelude::*;
 use std::time::Duration;
+
+use crate::diagnostics::SimulationDiagnosticsPlugin;
+use crate::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
+use crate::simulation::SimulationRunning;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, StageLabel)]
+pub struct FixedUpdateLabel;
 
 fn main() {
     App::new()
@@ -24,22 +28,22 @@ fn main() {
             present_mode: PresentMode::AutoNoVsync,
             ..default()
         })
-        .insert_resource(SimulationTimer::new(Duration::from_secs_f64(1. / 60.)))
+        .insert_resource(SimulationRunning(true))
+        .insert_resource(FixedTimestepConfig::new(Duration::from_secs_f64(1. / 60.)))
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(SimulationDiagnosticsPlugin)
+        .add_stage_before(
+            CoreStage::Update,
+            FixedUpdateLabel,
+            FixedTimestepStage::empty().with_stage(
+                SystemStage::parallel().with_system(step.run_if(simulation::is_simulation_running)),
+            ),
+        )
         .add_startup_system(add_camera)
         .add_startup_system(setup)
-        .add_system(simulation::simulation_tick)
-        .add_system(simulation::simulation_control)
-        .add_system_set(
-            ConditionSet::new()
-                .run_if(simulation::on_simulation_timer)
-                .label("Simulation")
-                .with_system(step)
-                .with_system(UpdateTimeDiagnosticsPlugin::diagnostic_system)
-                .into(),
-        )
+        .add_system(simulation::simulation_running_input_handler)
+        .add_system(simulation::simulation_timestep_input_handler)
         .run();
 }
 

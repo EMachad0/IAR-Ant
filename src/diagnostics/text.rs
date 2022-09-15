@@ -1,6 +1,7 @@
-use crate::UpdateTimeDiagnosticsPlugin;
 use bevy::diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin};
 use bevy::prelude::*;
+
+use crate::fixed_timestep::TimeStepDiagnosticsPlugin;
 
 #[derive(Component)]
 pub struct DiagnosticsText;
@@ -62,13 +63,13 @@ pub fn diagnostics_text_update(
     mut query: Query<&mut Text, With<DiagnosticsText>>,
 ) {
     for mut text in &mut query {
-        if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
-            if let Some(average) = fps.average() {
+        if let Some(diagnostic) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+            if let Some(average) = diagnostic.average() {
                 text.sections[1].value = format!("{average:.0}");
             }
         }
-        if let Some(fps) = diagnostics.get(UpdateTimeDiagnosticsPlugin::UPS) {
-            if let Some(average) = fps.average() {
+        if let Some(diagnostic) = diagnostics.get(TimeStepDiagnosticsPlugin::SPS) {
+            if let Some(average) = diagnostic.average() {
                 text.sections[4].value = format!("{average:.0}");
             }
         }

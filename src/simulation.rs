@@ -1,39 +1,33 @@
 use bevy::prelude::*;
-use std::time::Duration;
+
+use crate::fixed_timestep::FixedTimestepConfig;
 
 #[derive(Debug, Clone, Deref, DerefMut)]
-pub struct SimulationTimer(Timer);
+pub struct SimulationRunning(pub bool);
 
-impl SimulationTimer {
-    pub fn new(duration: Duration) -> Self {
-        Self(Timer::new(duration, true))
-    }
+pub fn is_simulation_running(flag: Res<SimulationRunning>) -> bool {
+    flag.0
 }
 
-pub fn on_simulation_timer(timer: Res<SimulationTimer>) -> bool {
-    timer.just_finished()
-}
-
-pub fn simulation_tick(mut simulation_state: ResMut<SimulationTimer>, time: Res<Time>) {
-    simulation_state.tick(time.delta());
-}
-
-pub fn simulation_control(kbd: Res<Input<KeyCode>>, mut timer: ResMut<SimulationTimer>) {
+pub fn simulation_running_input_handler(
+    kbd: Res<Input<KeyCode>>,
+    mut flag: ResMut<SimulationRunning>,
+) {
     if kbd.just_pressed(KeyCode::Space) {
-        if timer.paused() {
-            timer.unpause();
-        } else {
-            timer.pause()
+        flag.0 = !flag.0;
+    }
+}
+
+pub fn simulation_timestep_input_handler(
+    kbd: Res<Input<KeyCode>>,
+    timestep: Option<ResMut<FixedTimestepConfig>>,
+) {
+    if let Some(mut timestep) = timestep {
+        if kbd.just_pressed(KeyCode::P) {
+            timestep.step /= 2;
         }
-    }
-    if kbd.just_pressed(KeyCode::P) {
-        let duration = timer.duration() / 2;
-        timer.set_duration(duration);
-    }
-    if kbd.just_pressed(KeyCode::O) {
-        let duration = timer.duration() * 2;
-        if duration > Duration::ZERO {
-            timer.set_duration(duration);
+        if kbd.just_pressed(KeyCode::O) {
+            timestep.step *= 2;
         }
     }
 }
