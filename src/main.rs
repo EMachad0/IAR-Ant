@@ -2,8 +2,9 @@ mod diagnostics;
 mod simulation;
 
 use crate::diagnostics::update_time_diagnostics_plugin::UpdateTimeDiagnosticsPlugin;
+use crate::diagnostics::SimulationDiagnosticsPlugin;
 use crate::simulation::SimulationTimer;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+
 use bevy::math::vec3;
 use bevy::prelude::*;
 use bevy::render::camera::WindowOrigin;
@@ -26,19 +27,11 @@ fn main() {
         .insert_resource(SimulationTimer::new(Duration::from_secs_f64(1. / 60.)))
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_plugin(UpdateTimeDiagnosticsPlugin::default())
-        .add_plugin(LogDiagnosticsPlugin::filtered(vec![
-            FrameTimeDiagnosticsPlugin::FPS,
-            UpdateTimeDiagnosticsPlugin::UPS,
-        ]))
-        // .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(SimulationDiagnosticsPlugin)
         .add_startup_system(add_camera)
         .add_startup_system(setup)
-        .add_startup_system(diagnostics::text::diagnostics_text_setup)
         .add_system(simulation::simulation_tick)
         .add_system(simulation::simulation_control)
-        .add_system(diagnostics::text::diagnostics_text_update)
         .add_system_set(
             ConditionSet::new()
                 .run_if(simulation::on_simulation_timer)

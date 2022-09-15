@@ -7,8 +7,10 @@ pub struct DiagnosticsText;
 
 pub fn diagnostics_text_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
-        .spawn_bundle(
-            TextBundle::from_sections([
+        .spawn()
+        .insert(DiagnosticsText)
+        .insert_bundle(TextBundle {
+            text: Text::from_sections([
                 TextSection::new(
                     "FPS: ",
                     TextStyle {
@@ -43,13 +45,16 @@ pub fn diagnostics_text_setup(mut commands: Commands, asset_server: Res<AssetSer
                     font_size: 20.0,
                     color: Color::BLUE,
                 }),
-            ])
-            .with_style(Style {
+            ]),
+            style: Style {
                 align_self: AlignSelf::FlexEnd,
                 ..default()
-            }),
-        )
-        .insert(DiagnosticsText);
+            },
+            visibility: Visibility {
+                is_visible: cfg!(debug_assertions),
+            },
+            ..default()
+        });
 }
 
 pub fn diagnostics_text_update(
@@ -66,6 +71,18 @@ pub fn diagnostics_text_update(
             if let Some(average) = fps.average() {
                 text.sections[4].value = format!("{average:.0}");
             }
+        }
+    }
+}
+
+pub fn toggle_diagnostics_text_visibility(
+    kbd: Res<Input<KeyCode>>,
+    mut query: Query<&mut Visibility, With<DiagnosticsText>>,
+) {
+    if kbd.just_pressed(KeyCode::F3) {
+        for mut visibility in &mut query {
+            let current = visibility.is_visible;
+            visibility.is_visible = !current;
         }
     }
 }
