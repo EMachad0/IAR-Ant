@@ -28,13 +28,11 @@ pub fn simulation_control(kbd: Res<Input<KeyCode>>, mut timer: ResMut<Simulation
     }
     if kbd.just_pressed(KeyCode::P) {
         let duration = timer.duration() / 2;
-        dbg!(duration);
         timer.set_duration(duration);
     }
     if kbd.just_pressed(KeyCode::O) {
         let duration = timer.duration() * 2;
         if duration > Duration::ZERO {
-            dbg!(duration);
             timer.set_duration(duration);
         }
     }
