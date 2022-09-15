@@ -1,6 +1,6 @@
 mod diagnostics;
-mod fixed_timestep;
 mod simulation;
+mod timestep;
 
 use bevy::math::vec3;
 use bevy::prelude::*;
@@ -11,8 +11,8 @@ use iyes_loopless::prelude::*;
 use std::time::Duration;
 
 use crate::diagnostics::SimulationDiagnosticsPlugin;
-use crate::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
-use crate::simulation::SimulationRunning;
+use crate::simulation::control::SimulationRunning;
+use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, StageLabel)]
 pub struct FixedUpdateLabel;
@@ -37,13 +37,14 @@ fn main() {
             CoreStage::Update,
             FixedUpdateLabel,
             FixedTimestepStage::empty().with_stage(
-                SystemStage::parallel().with_system(step.run_if(simulation::is_simulation_running)),
+                SystemStage::parallel()
+                    .with_system(step.run_if(simulation::control::is_simulation_running)),
             ),
         )
         .add_startup_system(add_camera)
         .add_startup_system(setup)
-        .add_system(simulation::simulation_running_input_handler)
-        .add_system(simulation::simulation_timestep_input_handler)
+        .add_system(simulation::control::simulation_running_input_handler)
+        .add_system(timestep::control::timestep_input_handler)
         .run();
 }
 

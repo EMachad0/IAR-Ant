@@ -3,7 +3,7 @@ mod text;
 use bevy::app::{App, Plugin};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
-use crate::fixed_timestep::TimeStepDiagnosticsPlugin;
+use crate::timestep::diagnostic::TimeStepDiagnosticsPlugin;
 
 #[derive(Default)]
 pub struct SimulationDiagnosticsPlugin;
