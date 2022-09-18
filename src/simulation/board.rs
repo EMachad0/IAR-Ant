@@ -1,12 +1,12 @@
 use crate::simulation::board_position::BoardPosition;
 use crate::WINDOW_SIZE;
 use bevy::prelude::*;
-use std::ops::{Deref, DerefMut};
+use std::ops::{Deref, DerefMut, Index};
 
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Cell;
 
-type Matrix<T> = Vec<Vec<T>>;
+type Matrix<T> = Box<[T]>;
 
 pub const BOARD_SIZE: usize = (WINDOW_SIZE / CELL_SIZE) as usize;
 pub const CELL_BORDER: f32 = 1.;
@@ -36,11 +36,22 @@ impl DerefMut for Board {
 
 impl Board {
     pub fn new(width: usize, height: usize) -> Self {
+        let values = vec![Cell::default(); width * height].into_boxed_slice();
         Self {
             width,
             height,
-            values: vec![vec![Cell::default(); height]; width],
+            values,
         }
+    }
+}
+
+impl Index<usize> for Board {
+    type Output = [Cell];
+
+    fn index(&self, index: usize) -> &Self::Output {
+        let begin = index * self.width;
+        let end = begin + self.width;
+        &self.values[begin..end]
     }
 }
 
