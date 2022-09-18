@@ -9,6 +9,7 @@ edition = "2021"
 bevy = { version = "0.8.1", features = ["dynamic", "bevy_ui", "bevy_text"] }
 bevy-inspector-egui = "0.12.1"
 iyes_loopless = { version = "0.7.1", features = ["app", "states", "bevy-inspector-egui"], default-features=false}
+rand = "0.8.5"
 
 [profile.dev]
 opt-level = 1
