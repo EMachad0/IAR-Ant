@@ -3,6 +3,8 @@ use crate::{App, Board, Entity, Plugin, With};
 pub struct DebugInspectorPlugin;
 
 use crate::simulation::ant::Ant;
+use crate::simulation::food::Food;
+
 #[allow(unused_imports)]
 use bevy_inspector_egui::{
     widgets::{InspectorQuery, ResourceInspector},
@@ -12,6 +14,11 @@ use bevy_inspector_egui::{
 #[derive(Default, Inspectable)]
 pub struct AntInspector {
     ants: InspectorQuery<Entity, With<Ant>>,
+}
+
+#[derive(Default, Inspectable)]
+pub struct FoodInspector {
+    foods: InspectorQuery<Entity, With<Food>>,
 }
 
 #[derive(Default, Inspectable)]
@@ -27,7 +34,7 @@ impl Plugin for DebugInspectorPlugin {
                 // .add_plugin(WorldInspectorPlugin::new())
                 // .add_plugin(InspectorPlugin::<AntInspector>::new())
                 // .add_plugin(InspectorPlugin::<BoardInspector>::new())
-            ;
+                .add_plugin(InspectorPlugin::<FoodInspector>::new());
         }
     }
 }

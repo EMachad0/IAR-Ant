@@ -62,6 +62,7 @@ fn main() {
         .add_startup_system(simulation::board::board_setup)
         .add_startup_system(simulation::step::setup)
         .add_startup_system(simulation::ant::ant_spawn)
+        .add_startup_system(simulation::food::food_spawn)
         // Per Frame Systems
         .add_system(simulation::control::simulation_running_input_handler)
         .add_system(timestep::control::timestep_input_handler)

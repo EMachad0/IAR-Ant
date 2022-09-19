@@ -12,4 +12,7 @@ pub const CELL_SIZE: f32 = 400.;
 pub const CELL_PAINT: f32 = CELL_SIZE - 2. * CELL_BORDER;
 
 // Ant
-pub const ANT_COUNT: usize = 4;
+pub const ANT_COUNT: usize = 1;
+
+// Food
+pub const FOOD_COUNT: usize = 1;
