@@ -5,6 +5,9 @@ use bevy_inspector_egui::Inspectable;
 use super::{BoardPosition, Cell};
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
 
+#[derive(Component)]
+pub struct BoardEntity;
+
 #[derive(Debug, Default, Clone, Deref, DerefMut, Reflect, Inspectable)]
 #[reflect(Resource)]
 pub struct Board(Vec<Cell>);

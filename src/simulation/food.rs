@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, FOOD_COUNT};
-use crate::simulation::board::BoardPosition;
+use crate::simulation::board::{BoardEntity, BoardPosition};
 
 #[derive(Component)]
 pub struct Food;
@@ -39,6 +39,7 @@ pub fn food_spawn(mut commands: Commands, mut board: ResMut<Board>) {
                 ..default()
             })
             .insert(Food)
+            .insert(BoardEntity)
             .insert(pos)
             .id();
 

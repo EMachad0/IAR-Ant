@@ -46,18 +46,27 @@ fn main() {
         .add_stage_before(
             CoreStage::Update,
             FixedUpdateLabel,
-            FixedTimestepStage::empty().with_stage(
-                SystemStage::parallel().with_system_set(
-                    ConditionSet::new()
-                        .run_if(simulation::control::is_simulation_running)
-                        .with_system(simulation::step::step)
-                        .with_system(simulation::ant::ant_move)
-                        .with_system(simulation::ant::ant_pickup_drop)
-                        .with_system(simulation::ant::ant_texture_update)
-                        .with_system(simulation::board::update_board_position)
-                        .into(),
+            FixedTimestepStage::empty()
+                .with_stage(
+                    SystemStage::parallel().with_system_set(
+                        ConditionSet::new()
+                            .run_if(simulation::control::is_simulation_running)
+                            .with_system(simulation::step::step)
+                            .with_system(simulation::ant::ant_move)
+                            .with_system(simulation::ant::ant_pickup_drop)
+                            .into(),
+                    ),
+                )
+                .with_stage(
+                    SystemStage::parallel().with_system_set(
+                        ConditionSet::new()
+                            .run_if(simulation::control::is_simulation_running)
+                            .with_system(simulation::ant::ant_texture_update)
+                            .with_system(simulation::board::update_board_position)
+                            .with_system(simulation::board::update_removed_board_position)
+                            .into(),
+                    ),
                 ),
-            ),
         )
         // Setup
         .add_startup_system(add_camera)

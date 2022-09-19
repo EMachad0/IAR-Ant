@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE};
+use crate::simulation::board::BoardEntity;
 
 #[derive(Default, Debug, Copy, Clone, Component, Reflect)]
 #[reflect(Component)]
@@ -66,10 +67,23 @@ impl From<BoardPosition> for Transform {
 }
 
 pub fn update_board_position(
-    mut query: Query<(&mut Transform, &BoardPosition), Changed<BoardPosition>>,
+    mut query: Query<(&mut Transform, &mut Visibility, &BoardPosition), Changed<BoardPosition>>,
 ) {
-    for (mut transform, pos) in &mut query {
+    for (mut transform, mut visibility, pos) in &mut query {
+        visibility.is_visible = true;
         transform.translation = (*pos).into();
+    }
+}
+
+pub fn update_removed_board_position(
+    removals: RemovedComponents<BoardPosition>,
+    mut query: Query<&mut Visibility, (With<BoardEntity>, Without<BoardPosition>)>,
+) {
+    for entity in removals.iter() {
+        let mut visibility = query
+            .get_mut(entity)
+            .expect("Could not find entity with removed BoardEntity");
+        visibility.is_visible = false;
     }
 }
 

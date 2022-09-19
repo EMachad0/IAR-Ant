@@ -4,7 +4,7 @@ use rand::{distributions::Uniform, Rng};
 use std::ops::Deref;
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
-use crate::simulation::board::BoardPosition;
+use crate::simulation::board::{BoardEntity, BoardPosition};
 
 #[derive(Default, Component)]
 pub struct Ant {
@@ -42,6 +42,7 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut boa
                 ..default()
             })
             .insert(Ant::default())
+            .insert(BoardEntity)
             .insert(pos)
             .id();
 
