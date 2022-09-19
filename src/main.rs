@@ -51,7 +51,6 @@ fn main() {
                     SystemStage::parallel().with_system_set(
                         ConditionSet::new()
                             .run_if(simulation::control::is_simulation_running)
-                            .with_system(simulation::step::step)
                             .with_system(simulation::ant::ant_move)
                             .with_system(simulation::ant::ant_pickup_drop)
                             .into(),
@@ -71,7 +70,6 @@ fn main() {
         // Setup
         .add_startup_system(add_camera)
         .add_startup_system(simulation::board::board_setup)
-        .add_startup_system(simulation::step::setup)
         .add_startup_system(simulation::ant::ant_spawn)
         .add_startup_system(simulation::food::food_spawn)
         // Per Frame Systems
