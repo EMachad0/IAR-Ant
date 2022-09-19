@@ -5,7 +5,6 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 use crate::timestep::diagnostic::TimeStepDiagnosticsPlugin;
 
-#[derive(Default)]
 pub struct SimulationDiagnosticsPlugin;
 
 impl Plugin for SimulationDiagnosticsPlugin {
