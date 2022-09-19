@@ -1,15 +1,23 @@
-use crate::{BOARD_SIZE, CELL_SIZE};
 use bevy::prelude::*;
+
+use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE};
 
 #[derive(Debug, Copy, Clone, Component)]
 pub struct BoardPosition {
-    pub x: u32,
-    pub y: u32,
+    x: u32,
+    y: u32,
 }
 
 impl BoardPosition {
-    pub fn new(x: u32, y: u32) -> Self {
-        Self { x, y }
+    pub fn new(x: i32, y: i32) -> Result<Self, InvalidBoardPositionError> {
+        if Self::is_valid_position(x, y) {
+            Ok(Self {
+                x: x as u32,
+                y: y as u32,
+            })
+        } else {
+            Err(InvalidBoardPositionError { x, y })
+        }
     }
 
     pub fn to_world_position(&self) -> (f32, f32) {
@@ -20,10 +28,21 @@ impl BoardPosition {
         (x, y)
     }
 
-    pub fn add(&mut self, dx: i32, dy: i32) -> &mut Self {
-        self.x = (self.x as i32 + dx).clamp(0, BOARD_SIZE as i32) as u32;
-        self.y = (self.y as i32 + dy).clamp(0, BOARD_SIZE as i32) as u32;
-        self
+    pub fn add(&self, dx: i32, dy: i32) -> Result<Self, InvalidBoardPositionError> {
+        let (x, y) = (self.x as i32 + dx, self.y as i32 + dy);
+        Self::new(x, y)
+    }
+
+    pub fn x(&self) -> u32 {
+        self.x
+    }
+
+    pub fn y(&self) -> u32 {
+        self.y
+    }
+
+    pub fn is_valid_position(x: i32, y: i32) -> bool {
+        0 <= x && x < BOARD_WIDTH as i32 && 0 <= y && y < BOARD_HEIGHT as i32
     }
 }
 
@@ -50,5 +69,18 @@ pub fn update_board_position(
 ) {
     for (mut transform, pos) in &mut query {
         transform.translation = (*pos).into();
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
+pub struct InvalidBoardPositionError {
+    x: i32,
+    y: i32,
+}
+
+impl std::fmt::Display for InvalidBoardPositionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Attempted to create an invalid position")
     }
 }

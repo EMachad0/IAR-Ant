@@ -1,21 +1,20 @@
-use crate::simulation::board::CELL_PAINT;
-use crate::simulation::board_position::BoardPosition;
-use crate::BOARD_SIZE;
-pub use bevy::prelude::*;
+use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 
-const ANT_COUNT: u32 = 500;
+use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
+use crate::simulation::board_position::BoardPosition;
 
 #[derive(Component)]
 pub struct Ant;
 
 pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut rng = rand::thread_rng();
-    let range = Uniform::from(0..BOARD_SIZE as u32);
+    let range_x = Uniform::from(0..BOARD_WIDTH as i32);
+    let range_y = Uniform::from(0..BOARD_HEIGHT as i32);
     for _ in 0..ANT_COUNT {
-        let x = rng.sample(range);
-        let y = rng.sample(range);
-        let pos = BoardPosition::new(x, y);
+        let x = rng.sample(range_x);
+        let y = rng.sample(range_y);
+        let pos = BoardPosition::new(x, y).unwrap();
         commands
             .spawn()
             .insert_bundle(SpriteBundle {
@@ -36,8 +35,13 @@ pub fn ant_move(mut query: Query<&mut BoardPosition, With<Ant>>) {
     let mut rng = rand::thread_rng();
     let range = Uniform::from(-1..=1);
     for mut pos in &mut query {
-        let dx = rng.sample(range);
-        let dy = rng.sample(range);
-        pos.add(dx, dy);
+        loop {
+            let dx = rng.sample(range);
+            let dy = rng.sample(range);
+            if let Ok(new_pos) = pos.add(dx, dy) {
+                *pos = new_pos;
+                break;
+            }
+        }
     }
 }

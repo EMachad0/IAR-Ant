@@ -1,3 +1,4 @@
+mod consts;
 mod diagnostics;
 mod simulation;
 mod timestep;
@@ -8,14 +9,12 @@ use bevy::window::PresentMode;
 use iyes_loopless::prelude::*;
 use std::time::Duration;
 
+use crate::consts::{STARTING_UPS, WINDOW_SIZE};
 use crate::diagnostics::SimulationDiagnosticsPlugin;
-use crate::simulation::board::{Board, BOARD_SIZE, CELL_SIZE};
+use crate::simulation::board::Board;
 use crate::simulation::control::SimulationRunning;
 use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
 use crate::timestep::FixedUpdateLabel;
-
-const WINDOW_SIZE: f32 = 800.;
-const SIXTY: f64 = 1. / 60.;
 
 fn main() {
     App::new()
@@ -30,8 +29,10 @@ fn main() {
             ..default()
         })
         .insert_resource(SimulationRunning(true))
-        .insert_resource(FixedTimestepConfig::new(Duration::from_secs_f64(SIXTY)))
-        .insert_resource(Board::new(BOARD_SIZE, BOARD_SIZE))
+        .insert_resource(FixedTimestepConfig::new(Duration::from_secs_f64(
+            STARTING_UPS,
+        )))
+        .insert_resource(Board::new())
         // Plugins
         .add_plugins(DefaultPlugins)
         // .add_plugin(bevy_inspector_egui::WorldInspectorPlugin::WorldInspectorPlugin::new())
