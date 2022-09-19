@@ -52,6 +52,7 @@ fn main() {
                         .run_if(simulation::control::is_simulation_running)
                         .with_system(simulation::step::step)
                         .with_system(simulation::ant::ant_move)
+                        .with_system(simulation::ant::ant_pickup_drop)
                         .with_system(simulation::board::update_board_position)
                         .into(),
                 ),

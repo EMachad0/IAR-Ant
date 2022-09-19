@@ -72,3 +72,28 @@ pub fn ant_move(
         board.get_cell_mut(&new_pos).ant = Some(id);
     }
 }
+
+pub fn ant_pickup_drop(
+    mut commands: Commands,
+    mut query: Query<(&BoardPosition, &mut Ant)>,
+    mut board: ResMut<Board>,
+) {
+    let mut rng = rand::thread_rng();
+    for (pos, mut ant) in &mut query {
+        match (board.get_cell(pos).food, ant.food) {
+            (Some(food), None) => {
+                if rng.gen_bool(0.8) {
+                    commands.entity(food).remove::<BoardPosition>();
+                    ant.food = board.get_cell_mut(pos).food.take();
+                }
+            }
+            (None, Some(food)) => {
+                if rng.gen_bool(0.2) {
+                    commands.entity(food).insert(*pos);
+                    board.get_cell_mut(pos).food = ant.food.take();
+                }
+            }
+            (_, _) => {}
+        }
+    }
+}

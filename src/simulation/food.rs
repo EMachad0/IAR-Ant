@@ -42,6 +42,6 @@ pub fn food_spawn(mut commands: Commands, mut board: ResMut<Board>) {
             .insert(pos)
             .id();
 
-        board.get_cell_mut(pos).food = Some(id);
+        board.get_cell_mut(&pos).food = Some(id);
     }
 }
