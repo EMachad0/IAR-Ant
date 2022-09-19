@@ -1,12 +1,15 @@
 use crate::Board;
 use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
+use std::ops::Deref;
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
 use crate::simulation::board::BoardPosition;
 
-#[derive(Component)]
-pub struct Ant;
+#[derive(Default, Component)]
+pub struct Ant {
+    pub food: Option<Entity>,
+}
 
 pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut board: ResMut<Board>) {
     if ANT_COUNT > BOARD_WIDTH * BOARD_HEIGHT {
@@ -22,7 +25,7 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut boa
             let x = rng.sample(range_x);
             let y = rng.sample(range_y);
             let pos = BoardPosition::new(x, y).unwrap();
-            if board.get_cell(pos).ant.is_none() {
+            if board.get_cell(&pos).ant.is_none() {
                 break pos;
             }
         };
@@ -38,11 +41,11 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut boa
                 transform: pos.into(),
                 ..default()
             })
-            .insert(Ant)
+            .insert(Ant::default())
             .insert(pos)
             .id();
 
-        board.get_cell_mut(pos).ant = Some(id);
+        board.get_cell_mut(&pos).ant = Some(id);
     }
 }
 
@@ -53,19 +56,19 @@ pub fn ant_move(
     let mut rng = rand::thread_rng();
     let range = Uniform::from(-1..=1);
     for (id, mut pos) in &mut query {
-        board.get_cell_mut(*pos).ant = None;
+        board.get_cell_mut(pos.deref()).ant = None;
 
         let new_pos = loop {
             let dx = rng.sample(range);
             let dy = rng.sample(range);
             if let Ok(new_pos) = pos.add(dx, dy) {
-                if board.get_cell(new_pos).ant.is_none() {
+                if board.get_cell(&new_pos).ant.is_none() {
                     break new_pos;
                 }
             }
         };
 
         *pos = new_pos;
-        board.get_cell_mut(new_pos).ant = Some(id);
+        board.get_cell_mut(&new_pos).ant = Some(id);
     }
 }

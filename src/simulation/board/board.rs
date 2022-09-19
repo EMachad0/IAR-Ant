@@ -15,11 +15,11 @@ impl Board {
         Self(values)
     }
 
-    pub fn get_cell(&self, pos: BoardPosition) -> &Cell {
+    pub fn get_cell(&self, pos: &BoardPosition) -> &Cell {
         &self[pos.x()][pos.y()]
     }
 
-    pub fn get_cell_mut(&mut self, pos: BoardPosition) -> &mut Cell {
+    pub fn get_cell_mut(&mut self, pos: &BoardPosition) -> &mut Cell {
         &mut self[pos.x()][pos.y()]
     }
 }

@@ -22,7 +22,7 @@ pub fn food_spawn(mut commands: Commands, mut board: ResMut<Board>) {
             let x = rng.sample(range_x);
             let y = rng.sample(range_y);
             let pos = BoardPosition::new(x, y).unwrap();
-            if board.get_cell(pos).food.is_none() {
+            if board.get_cell(&pos).food.is_none() {
                 break pos;
             }
         };
