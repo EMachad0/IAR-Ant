@@ -1,6 +1,6 @@
 // Window setup
 pub const WINDOW_SIZE: f32 = 800.;
-pub const STARTING_UPS: f64 = 1. / 60.;
+pub const STARTING_UPS: f64 = 1. / 10.;
 
 // Board
 pub const BOARD_WIDTH: usize = (WINDOW_SIZE / CELL_SIZE) as usize;
