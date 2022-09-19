@@ -34,7 +34,8 @@ impl Plugin for DebugInspectorPlugin {
                 // .add_plugin(WorldInspectorPlugin::new())
                 // .add_plugin(InspectorPlugin::<AntInspector>::new())
                 // .add_plugin(InspectorPlugin::<BoardInspector>::new())
-                .add_plugin(InspectorPlugin::<FoodInspector>::new());
+                // .add_plugin(InspectorPlugin::<FoodInspector>::new())
+            ;
         }
     }
 }
