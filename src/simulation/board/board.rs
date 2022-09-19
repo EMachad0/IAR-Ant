@@ -1,21 +1,26 @@
 use bevy::prelude::*;
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
+use bevy_inspector_egui::Inspectable;
 
+use super::{BoardPosition, Cell};
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
-use crate::simulation::board::BoardPosition;
 
-#[derive(Debug, Default, Copy, Clone)]
-pub struct Cell;
-
-type Matrix<T> = Box<[T]>;
-
-#[derive(Debug, Default, Deref, DerefMut)]
-pub struct Board(Matrix<Cell>);
+#[derive(Debug, Default, Clone, Deref, DerefMut, Reflect, Inspectable)]
+#[reflect(Resource)]
+pub struct Board(Vec<Cell>);
 
 impl Board {
     pub fn new() -> Self {
-        let values = vec![Cell::default(); BOARD_WIDTH * BOARD_HEIGHT].into_boxed_slice();
+        let values = vec![Cell::default(); BOARD_WIDTH * BOARD_HEIGHT];
         Self(values)
+    }
+
+    pub fn get_cell(&self, pos: BoardPosition) -> &Cell {
+        &self[pos.x()][pos.y()]
+    }
+
+    pub fn get_cell_mut(&mut self, pos: BoardPosition) -> &mut Cell {
+        &mut self[pos.x()][pos.y()]
     }
 }
 
@@ -26,6 +31,14 @@ impl Index<usize> for Board {
         let begin = index * BOARD_WIDTH;
         let end = begin + BOARD_WIDTH;
         &self.0[begin..end]
+    }
+}
+
+impl IndexMut<usize> for Board {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        let begin = index * BOARD_WIDTH;
+        let end = begin + BOARD_WIDTH;
+        &mut self.0[begin..end]
     }
 }
 

@@ -1,5 +1,6 @@
 mod consts;
 mod diagnostics;
+mod inspector;
 mod simulation;
 mod timestep;
 
@@ -11,7 +12,8 @@ use std::time::Duration;
 
 use crate::consts::{STARTING_UPS, WINDOW_SIZE};
 use crate::diagnostics::SimulationDiagnosticsPlugin;
-use crate::simulation::board::Board;
+use crate::inspector::DebugInspectorPlugin;
+use crate::simulation::board::{Board, BoardPosition};
 use crate::simulation::control::SimulationRunning;
 use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
 use crate::timestep::FixedUpdateLabel;
@@ -35,8 +37,11 @@ fn main() {
         .insert_resource(Board::new())
         // Plugins
         .add_plugins(DefaultPlugins)
-        // .add_plugin(bevy_inspector_egui::WorldInspectorPlugin::WorldInspectorPlugin::new())
+        .add_plugin(DebugInspectorPlugin)
         .add_plugin(SimulationDiagnosticsPlugin)
+        // Register types
+        .register_type::<Board>()
+        .register_type::<BoardPosition>()
         // Simulation Stage
         .add_stage_before(
             CoreStage::Update,

@@ -2,18 +2,19 @@ use bevy::prelude::*;
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE};
 
-#[derive(Debug, Copy, Clone, Component)]
+#[derive(Default, Debug, Copy, Clone, Component, Reflect)]
+#[reflect(Component)]
 pub struct BoardPosition {
-    x: u32,
-    y: u32,
+    x: usize,
+    y: usize,
 }
 
 impl BoardPosition {
     pub fn new(x: i32, y: i32) -> Result<Self, InvalidBoardPositionError> {
         if Self::is_valid_position(x, y) {
             Ok(Self {
-                x: x as u32,
-                y: y as u32,
+                x: x as usize,
+                y: y as usize,
             })
         } else {
             Err(InvalidBoardPositionError { x, y })
@@ -33,11 +34,11 @@ impl BoardPosition {
         Self::new(x, y)
     }
 
-    pub fn x(&self) -> u32 {
+    pub fn x(&self) -> usize {
         self.x
     }
 
-    pub fn y(&self) -> u32 {
+    pub fn y(&self) -> usize {
         self.y
     }
 
