@@ -97,3 +97,15 @@ pub fn ant_pickup_drop(
         }
     }
 }
+
+pub fn ant_texture_update(
+    mut query: Query<(&mut Handle<Image>, &Ant), Changed<Ant>>,
+    asset_server: Res<AssetServer>,
+) {
+    for (mut image, ant) in &mut query {
+        match ant.food {
+            None => *image = asset_server.load("img/empty_ant.png"),
+            Some(_) => *image = asset_server.load("img/carry_ant.png"),
+        }
+    }
+}

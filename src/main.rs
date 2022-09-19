@@ -53,6 +53,7 @@ fn main() {
                         .with_system(simulation::step::step)
                         .with_system(simulation::ant::ant_move)
                         .with_system(simulation::ant::ant_pickup_drop)
+                        .with_system(simulation::ant::ant_texture_update)
                         .with_system(simulation::board::update_board_position)
                         .into(),
                 ),
