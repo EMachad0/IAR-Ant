@@ -10,8 +10,9 @@ pub struct Food;
 
 pub fn food_spawn(mut commands: Commands, mut board: ResMut<Board>) {
     if FOOD_COUNT > BOARD_WIDTH * BOARD_HEIGHT {
-        error!("More food than board cells");
-        panic!("More food than board cells");
+        let error_message = "More food than board cells";
+        error!("{error_message}");
+        panic!("{error_message}");
     }
 
     let mut rng = rand::thread_rng();

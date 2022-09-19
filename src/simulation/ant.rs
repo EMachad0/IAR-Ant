@@ -14,8 +14,9 @@ pub struct Ant {
 
 pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut board: ResMut<Board>) {
     if ANT_COUNT > BOARD_WIDTH * BOARD_HEIGHT {
-        error!("More ants than board cells");
-        panic!("More ants than board cells");
+        let error_message = "More ants than board cells";
+        error!("{error_message}");
+        panic!("{error_message}");
     }
 
     let mut rng = rand::thread_rng();

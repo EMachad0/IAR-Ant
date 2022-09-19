@@ -77,12 +77,14 @@ pub fn update_board_position(
 
 pub fn update_removed_board_position(
     removals: RemovedComponents<BoardPosition>,
-    mut query: Query<&mut Visibility, (With<BoardEntity>, Without<BoardPosition>)>,
+    mut query: Query<&mut Visibility, With<BoardEntity>>,
 ) {
     for entity in removals.iter() {
-        let mut visibility = query
-            .get_mut(entity)
-            .expect("Could not find entity with removed BoardEntity");
+        let mut visibility = query.get_mut(entity).unwrap_or_else(|_| {
+            let error_message = "Could not find BoardEntity with removed BoardPosition";
+            error!("{error_message}");
+            panic!("{error_message}");
+        });
         visibility.is_visible = false;
     }
 }
