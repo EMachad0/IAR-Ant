@@ -6,7 +6,8 @@ use std::ops::Deref;
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
 use crate::simulation::board::{BoardEntity, BoardPosition};
 
-#[derive(Default, Component)]
+#[derive(Default, Component, Reflect)]
+#[reflect(Component)]
 pub struct Ant {
     pub food: Option<Entity>,
 }

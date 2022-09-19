@@ -13,6 +13,7 @@ use std::time::Duration;
 use crate::consts::{STARTING_UPS, WINDOW_SIZE};
 use crate::diagnostics::SimulationDiagnosticsPlugin;
 use crate::inspector::DebugInspectorPlugin;
+use crate::simulation::ant::Ant;
 use crate::simulation::board::{Board, BoardPosition};
 use crate::simulation::control::SimulationRunning;
 use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
@@ -41,6 +42,7 @@ fn main() {
         .add_plugin(SimulationDiagnosticsPlugin)
         // Register types
         .register_type::<Board>()
+        .register_type::<Ant>()
         .register_type::<BoardPosition>()
         // Simulation Stage
         .add_stage_before(
