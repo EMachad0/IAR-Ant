@@ -1,9 +1,9 @@
-use crate::Board;
 use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, FOOD_COUNT};
 use crate::simulation::board::{BoardEntity, BoardPosition};
+use crate::Board;
 
 #[derive(Component)]
 pub struct Food;

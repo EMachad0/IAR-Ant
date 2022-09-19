@@ -1,10 +1,10 @@
-use crate::Board;
 use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use std::ops::Deref;
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
 use crate::simulation::board::{BoardEntity, BoardPosition};
+use crate::Board;
 
 #[derive(Default, Component, Reflect)]
 #[reflect(Component)]
