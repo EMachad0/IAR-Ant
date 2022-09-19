@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
-use crate::simulation::board_position::BoardPosition;
+use crate::simulation::board::BoardPosition;
 
 #[derive(Component)]
 pub struct Ant;

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use std::ops::Index;
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
-use crate::simulation::board_position::BoardPosition;
+use crate::simulation::board::BoardPosition;
 
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Cell;
