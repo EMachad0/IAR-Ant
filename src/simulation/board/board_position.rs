@@ -89,6 +89,7 @@ pub fn update_removed_board_position(
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct InvalidBoardPositionError {
     x: i32,
