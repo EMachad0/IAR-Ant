@@ -15,7 +15,7 @@ impl Plugin for SimulationDiagnosticsPlugin {
                 FrameTimeDiagnosticsPlugin::FPS,
                 TimeStepDiagnosticsPlugin::SPS,
             ]))
-            .add_plugin(LogDiagnosticsPlugin::default())
+            // .add_plugin(LogDiagnosticsPlugin::default())
             .add_startup_system(text::diagnostics_text_setup)
             .add_system(text::diagnostics_text_update)
             .add_system(text::toggle_diagnostics_text_visibility);
