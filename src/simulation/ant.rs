@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
-use std::ops::Deref;
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, VIEW_RADIUS};
 use crate::simulation::board::{BoardEntity, BoardPosition};
@@ -59,7 +58,7 @@ pub fn ant_move(
     let mut rng = rand::thread_rng();
     let range = Uniform::from(-1..=1);
     for (id, mut pos) in &mut query {
-        board.get_cell_mut(pos.deref()).ant = None;
+        board.get_cell_mut(&*pos).ant = None;
 
         let new_pos = loop {
             let dx = rng.sample(range);
