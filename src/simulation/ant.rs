@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{distributions::Uniform, Rng};
 use std::ops::Deref;
 
-use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
+use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, VIEW_RADIUS};
 use crate::simulation::board::{BoardEntity, BoardPosition};
 use crate::Board;
 
@@ -83,15 +83,33 @@ pub fn ant_pickup_drop(
 ) {
     let mut rng = rand::thread_rng();
     for (pos, mut ant) in &mut query {
+        let (empty_cells, food_cells) = {
+            let mut empty_cells = 0;
+            let mut food_cells = 0;
+            for dx in -VIEW_RADIUS..=VIEW_RADIUS {
+                for dy in -VIEW_RADIUS..=VIEW_RADIUS {
+                    if let Ok(lookup_pos) = pos.add(dx, dy) {
+                        match board.get_cell(&lookup_pos).food {
+                            None => empty_cells += 1,
+                            Some(_) => food_cells += 1,
+                        }
+                    }
+                }
+            }
+            (empty_cells, food_cells)
+        };
+        let ratio = food_cells as f64 / (food_cells + empty_cells) as f64;
+        let threshold = 0.3;
+
         match (board.get_cell(pos).food, ant.food) {
             (Some(food), None) => {
-                if rng.gen_bool(0.8) {
+                if ratio <= threshold {
                     commands.entity(food).remove::<BoardPosition>();
                     ant.food = board.get_cell_mut(pos).food.take();
                 }
             }
             (None, Some(food)) => {
-                if rng.gen_bool(0.2) {
+                if ratio > threshold {
                     commands.entity(food).insert(*pos);
                     board.get_cell_mut(pos).food = ant.food.take();
                 }
