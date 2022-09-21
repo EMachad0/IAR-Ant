@@ -48,16 +48,15 @@ fn main() {
         .add_stage_before(
             CoreStage::Update,
             FixedUpdateLabel,
-            FixedTimestepStage::empty()
-                .with_stage(
-                    SystemStage::parallel().with_system_set(
-                        ConditionSet::new()
-                            .run_if(simulation::control::is_simulation_running)
-                            .with_system(simulation::ant::ant_move)
-                            .with_system(simulation::ant::ant_pickup_drop)
-                            .into(),
-                    ),
-                )
+            FixedTimestepStage::empty().with_stage(
+                SystemStage::parallel().with_system_set(
+                    ConditionSet::new()
+                        .run_if(simulation::control::is_simulation_running)
+                        .with_system(simulation::ant::ant_move)
+                        .with_system(simulation::ant::ant_pickup_drop)
+                        .into(),
+                ),
+            ),
         )
         // Setup
         .add_startup_system(add_camera)
@@ -66,8 +65,8 @@ fn main() {
         .add_startup_system(simulation::food::food_spawn)
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
-        .add_system(simulation::board::update_removed_board_position)
-        .add_system(simulation::board::update_board_position)
+        .add_system(simulation::board::update_removed_board_position.label("remove_board_position"))
+        .add_system(simulation::board::update_board_position.after("remove_board_position"))
         .add_system(simulation::control::simulation_running_input_handler)
         .add_system(timestep::control::timestep_input_handler)
         // Run

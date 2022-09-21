@@ -87,6 +87,9 @@ pub fn ant_pickup_drop(
             let mut food_cells = 0;
             for dx in -VIEW_RADIUS..=VIEW_RADIUS {
                 for dy in -VIEW_RADIUS..=VIEW_RADIUS {
+                    if dx == 0 && dy == 0 {
+                        continue;
+                    }
                     if let Ok(lookup_pos) = pos.add(dx, dy) {
                         match board.get_cell(&lookup_pos).food {
                             None => empty_cells += 1,
@@ -95,20 +98,21 @@ pub fn ant_pickup_drop(
                     }
                 }
             }
-            (empty_cells, food_cells)
+            (empty_cells as f64, food_cells as f64)
         };
-        let ratio = food_cells as f64 / (food_cells + empty_cells) as f64;
-        let threshold = 0.3;
+        let ratio = food_cells / (food_cells + empty_cells);
+        let threshold = 100. / 80.;
+        let prob = (ratio * threshold).min(1.);
 
         match (board.get_cell(pos).food, ant.food) {
             (Some(food), None) => {
-                if ratio <= threshold {
+                if rng.gen_bool(1. - prob) {
                     commands.entity(food).remove::<BoardPosition>();
                     ant.food = board.get_cell_mut(pos).food.take();
                 }
             }
             (None, Some(food)) => {
-                if ratio > threshold {
+                if rng.gen_bool(prob) {
                     commands.entity(food).insert(*pos);
                     board.get_cell_mut(pos).food = ant.food.take();
                 }
