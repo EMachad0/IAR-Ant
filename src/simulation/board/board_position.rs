@@ -12,6 +12,10 @@ pub struct BoardPosition {
 
 impl BoardPosition {
     pub fn new(x: i32, y: i32) -> Result<Self, InvalidBoardPositionError> {
+        let width = BOARD_WIDTH as i32;
+        let height = BOARD_HEIGHT as i32;
+        let x = (x % width + width) % width;
+        let y = (y % height + height) % height;
         if Self::is_valid_position(x, y) {
             Ok(Self {
                 x: x as usize,
