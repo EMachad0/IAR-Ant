@@ -1,17 +1,29 @@
 use bevy::prelude::*;
 
-#[derive(Debug, Clone, Deref, DerefMut)]
-pub struct SimulationRunning(pub bool);
-
-pub fn is_simulation_running(flag: Res<SimulationRunning>) -> bool {
-    flag.0
+#[derive(Debug, Copy, Clone, Default)]
+pub struct SimulationStatus {
+    pub paused: bool,
+    pub ending: bool,
 }
 
-pub fn simulation_running_input_handler(
+pub fn is_simulation_paused(status: Res<SimulationStatus>) -> bool {
+    status.paused
+}
+
+pub fn simulation_pause_input_handler(
     kbd: Res<Input<KeyCode>>,
-    mut flag: ResMut<SimulationRunning>,
+    mut status: ResMut<SimulationStatus>,
+) {
+    if kbd.just_pressed(KeyCode::K) {
+        status.paused = !status.paused;
+    }
+}
+
+pub fn simulation_ending_input_handler(
+    kbd: Res<Input<KeyCode>>,
+    mut status: ResMut<SimulationStatus>,
 ) {
     if kbd.just_pressed(KeyCode::Space) {
-        flag.0 = !flag.0;
+        status.ending = !status.ending;
     }
 }

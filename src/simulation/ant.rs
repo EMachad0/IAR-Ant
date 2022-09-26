@@ -3,7 +3,7 @@ use rand::{distributions::Uniform, Rng};
 
 use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, VIEW_RADIUS};
 use crate::simulation::board::{BoardEntity, BoardPosition};
-use crate::Board;
+use crate::{Board, SimulationStatus};
 
 #[derive(Default, Component, Reflect)]
 #[reflect(Component)]
@@ -52,12 +52,17 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>, mut boa
 }
 
 pub fn ant_move(
-    mut query: Query<(Entity, &mut BoardPosition), With<Ant>>,
+    status: Res<SimulationStatus>,
+    mut query: Query<(Entity, &Ant, &mut BoardPosition)>,
     mut board: ResMut<Board>,
 ) {
     let mut rng = rand::thread_rng();
     let range = Uniform::from(-1..=1);
-    for (id, mut pos) in &mut query {
+    for (id, ant, mut pos) in &mut query {
+        if status.ending && ant.food.is_none() {
+            continue;
+        }
+
         board.get_cell_mut(&*pos).ant = None;
 
         let new_pos = loop {
@@ -76,6 +81,7 @@ pub fn ant_move(
 }
 
 pub fn ant_pickup_drop(
+    status: Res<SimulationStatus>,
     mut commands: Commands,
     mut query: Query<(&BoardPosition, &mut Ant)>,
     mut board: ResMut<Board>,
@@ -106,7 +112,7 @@ pub fn ant_pickup_drop(
 
         match (board.get_cell(pos).food, ant.food) {
             (Some(food), None) => {
-                if rng.gen_bool(1. - prob) {
+                if !status.ending && rng.gen_bool(1. - prob) {
                     commands.entity(food).remove::<BoardPosition>();
                     ant.food = board.get_cell_mut(pos).food.take();
                 }
