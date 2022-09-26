@@ -1,9 +1,11 @@
-use crate::{App, Board, Entity, Plugin, With};
+use bevy::prelude::*;
 
 pub struct DebugInspectorPlugin;
 
 use crate::simulation::ant::Ant;
 use crate::simulation::food::Food;
+use crate::timestep::fixed_timestep::FixedTimestepConfig;
+use crate::simulation::board::Board;
 
 #[allow(unused_imports)]
 use bevy_inspector_egui::{
@@ -26,6 +28,11 @@ pub struct BoardInspector {
     board: ResourceInspector<Board>,
 }
 
+#[derive(Default, Inspectable)]
+pub struct SimulationControlInspector {
+    config: ResourceInspector<FixedTimestepConfig>,
+}
+
 impl Plugin for DebugInspectorPlugin {
     #[allow(unused_variables, path_statements)]
     fn build(&self, app: &mut App) {
@@ -35,6 +42,7 @@ impl Plugin for DebugInspectorPlugin {
                 // .add_plugin(InspectorPlugin::<AntInspector>::new())
                 // .add_plugin(InspectorPlugin::<BoardInspector>::new())
                 // .add_plugin(InspectorPlugin::<FoodInspector>::new())
+                // .add_plugin(InspectorPlugin::<SimulationControlInspector>::new())
             ;
         }
     }

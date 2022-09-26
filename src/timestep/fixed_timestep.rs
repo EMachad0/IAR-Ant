@@ -6,13 +6,14 @@
 use bevy::diagnostic::Diagnostics;
 use bevy::prelude::*;
 use std::time::Duration;
+use bevy_inspector_egui::Inspectable;
 
 use crate::timestep::diagnostic::{TimeStepDiagnosticsPlugin, TimeStepDiagnosticsState};
 
 /// If you modify the step value, the fixed timestep driver stage will
 /// reconfigure itself to respect it. Your new timestep duration will be
 /// used starting from the next update cycle.
-#[derive(Debug)]
+#[derive(Debug, Inspectable)]
 pub struct FixedTimestepConfig {
     pub step: Duration,
 }
