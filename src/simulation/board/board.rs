@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use std::ops::{Index, IndexMut};
 use bevy_inspector_egui::Inspectable;
+use std::ops::{Index, IndexMut};
 
 use super::{BoardPosition, Cell};
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT};
@@ -48,7 +48,7 @@ impl IndexMut<usize> for Board {
 pub fn board_setup(mut commands: Commands) {
     for i in 0..BOARD_WIDTH {
         for j in 0..BOARD_HEIGHT {
-            let board_position = BoardPosition::new(i as i32, j as i32).unwrap();
+            let board_position = BoardPosition::new(i as i32, j as i32);
             commands.spawn_bundle(SpriteBundle {
                 sprite: Sprite {
                     color: Color::GREEN,

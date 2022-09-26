@@ -19,7 +19,7 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         let pos = {
             let x = rng.sample(range_x);
             let y = rng.sample(range_y);
-            BoardPosition::new(x, y).unwrap()
+            BoardPosition::new(x, y)
         };
 
         commands
@@ -39,10 +39,7 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
     }
 }
 
-pub fn ant_move(
-    status: Res<SimulationStatus>,
-    mut query: Query<(&Ant, &mut BoardPosition)>,
-) {
+pub fn ant_move(status: Res<SimulationStatus>, mut query: Query<(&Ant, &mut BoardPosition)>) {
     let mut rng = rand::thread_rng();
     let range = Uniform::from(-1..=1);
     for (ant, mut pos) in &mut query {
@@ -53,7 +50,7 @@ pub fn ant_move(
         let new_pos = {
             let dx = rng.sample(range);
             let dy = rng.sample(range);
-            pos.add(dx, dy).unwrap()
+            pos.add(dx, dy)
         };
 
         *pos = new_pos;
@@ -76,11 +73,10 @@ pub fn ant_pickup_drop(
                     if dx == 0 && dy == 0 {
                         continue;
                     }
-                    if let Ok(lookup_pos) = pos.add(dx, dy) {
-                        match board.get_cell(&lookup_pos).food {
-                            None => empty_cells += 1,
-                            Some(_) => food_cells += 1,
-                        }
+                    let lookup_pos = pos.add(dx, dy);
+                    match board.get_cell(&lookup_pos).food {
+                        None => empty_cells += 1,
+                        Some(_) => food_cells += 1,
                     }
                 }
             }

@@ -11,18 +11,14 @@ pub struct BoardPosition {
 }
 
 impl BoardPosition {
-    pub fn new(x: i32, y: i32) -> Result<Self, InvalidBoardPositionError> {
+    pub fn new(x: i32, y: i32) -> Self {
         let width = BOARD_WIDTH as i32;
         let height = BOARD_HEIGHT as i32;
         let x = (x % width + width) % width;
         let y = (y % height + height) % height;
-        if Self::is_valid_position(x, y) {
-            Ok(Self {
-                x: x as usize,
-                y: y as usize,
-            })
-        } else {
-            Err(InvalidBoardPositionError { x, y })
+        Self {
+            x: x as usize,
+            y: y as usize,
         }
     }
 
@@ -34,7 +30,7 @@ impl BoardPosition {
         (x, y)
     }
 
-    pub fn add(&self, dx: i32, dy: i32) -> Result<Self, InvalidBoardPositionError> {
+    pub fn add(&self, dx: i32, dy: i32) -> Self {
         let (x, y) = (self.x as i32 + dx, self.y as i32 + dy);
         Self::new(x, y)
     }
@@ -45,10 +41,6 @@ impl BoardPosition {
 
     pub fn y(&self) -> usize {
         self.y
-    }
-
-    pub fn is_valid_position(x: i32, y: i32) -> bool {
-        0 <= x && x < BOARD_WIDTH as i32 && 0 <= y && y < BOARD_HEIGHT as i32
     }
 }
 
@@ -90,18 +82,5 @@ pub fn update_removed_board_position(
             panic!("{error_message}");
         });
         visibility.is_visible = false;
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Debug, Clone)]
-pub struct InvalidBoardPositionError {
-    x: i32,
-    y: i32,
-}
-
-impl std::fmt::Display for InvalidBoardPositionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Attempted to create an invalid position")
     }
 }
