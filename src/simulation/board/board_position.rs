@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use rand::distributions::Uniform;
+use rand::Rng;
 
 use crate::consts::{BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE};
 use crate::simulation::board::BoardEntity;
@@ -33,6 +35,35 @@ impl BoardPosition {
     pub fn add(&self, dx: i32, dy: i32) -> Self {
         let (x, y) = (self.x as i32 + dx, self.y as i32 + dy);
         Self::new(x, y)
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(0..BOARD_WIDTH as i32);
+        let y = rng.gen_range(0..BOARD_HEIGHT as i32);
+        BoardPosition::new(x, y)
+    }
+
+    pub fn get_all_adjacent(&self, radius: i32) -> Vec<Self> {
+        let mut adj = Vec::new();
+        for dx in -radius..=radius {
+            for dy in -radius..=radius {
+                if dx == 0 && dy == 0 {
+                    continue;
+                }
+                let lookup_pos = self.add(dx, dy);
+                adj.push(lookup_pos);
+            }
+        }
+        adj
+    }
+
+    pub fn get_random_adjacent(&self) -> Self {
+        let mut rng = rand::thread_rng();
+        let range = Uniform::from(-1..=1);
+        let dx = rng.sample(range);
+        let dy = rng.sample(range);
+        self.add(dx, dy)
     }
 
     pub fn x(&self) -> usize {

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use rand::{distributions::Uniform, Rng};
+use rand::Rng;
 
-use crate::consts::{ANT_COUNT, BOARD_HEIGHT, BOARD_WIDTH, CELL_PAINT, VIEW_RADIUS};
+use crate::consts::{ANT_COUNT, CELL_PAINT, VIEW_RADIUS};
 use crate::simulation::board::{BoardEntity, BoardPosition};
 use crate::{Board, SimulationStatus};
 
@@ -12,15 +12,8 @@ pub struct Ant {
 }
 
 pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut rng = rand::thread_rng();
-    let range_x = Uniform::from(0..BOARD_WIDTH as i32);
-    let range_y = Uniform::from(0..BOARD_HEIGHT as i32);
     for _ in 0..ANT_COUNT {
-        let pos = {
-            let x = rng.sample(range_x);
-            let y = rng.sample(range_y);
-            BoardPosition::new(x, y)
-        };
+        let pos = BoardPosition::random();
 
         commands
             .spawn()
@@ -40,19 +33,11 @@ pub fn ant_spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn ant_move(status: Res<SimulationStatus>, mut query: Query<(&Ant, &mut BoardPosition)>) {
-    let mut rng = rand::thread_rng();
-    let range = Uniform::from(-1..=1);
     for (ant, mut pos) in &mut query {
         if status.ending && ant.food.is_none() {
             continue;
         }
-
-        let new_pos = {
-            let dx = rng.sample(range);
-            let dy = rng.sample(range);
-            pos.add(dx, dy)
-        };
-
+        let new_pos = pos.get_random_adjacent();
         *pos = new_pos;
     }
 }
@@ -68,16 +53,10 @@ pub fn ant_pickup_drop(
         let (empty_cells, food_cells) = {
             let mut empty_cells = 0;
             let mut food_cells = 0;
-            for dx in -VIEW_RADIUS..=VIEW_RADIUS {
-                for dy in -VIEW_RADIUS..=VIEW_RADIUS {
-                    if dx == 0 && dy == 0 {
-                        continue;
-                    }
-                    let lookup_pos = pos.add(dx, dy);
-                    match board.get_cell(&lookup_pos).food {
-                        None => empty_cells += 1,
-                        Some(_) => food_cells += 1,
-                    }
+            for lookup_pos in pos.get_all_adjacent(VIEW_RADIUS) {
+                match board.get_cell(&lookup_pos).food {
+                    None => empty_cells += 1,
+                    Some(_) => food_cells += 1,
                 }
             }
             (empty_cells as f64, food_cells as f64)
