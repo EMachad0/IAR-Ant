@@ -3,9 +3,9 @@ use bevy::prelude::*;
 pub struct DebugInspectorPlugin;
 
 use crate::simulation::ant::Ant;
-use crate::simulation::food::Food;
+// use crate::simulation::food::Food;
 use crate::timestep::fixed_timestep::FixedTimestepConfig;
-use crate::simulation::board::Board;
+use crate::simulation::board::IcoBoard;
 
 #[allow(unused_imports)]
 use bevy_inspector_egui::{
@@ -18,14 +18,14 @@ pub struct AntInspector {
     ants: InspectorQuery<Entity, With<Ant>>,
 }
 
-#[derive(Default, Inspectable)]
-pub struct FoodInspector {
-    foods: InspectorQuery<Entity, With<Food>>,
-}
+// #[derive(Default, Inspectable)]
+// pub struct FoodInspector {
+//     foods: InspectorQuery<Entity, With<Food>>,
+// }
 
 #[derive(Default, Inspectable)]
 pub struct BoardInspector {
-    board: ResourceInspector<Board>,
+    board: ResourceInspector<IcoBoard>,
 }
 
 #[derive(Default, Inspectable)]

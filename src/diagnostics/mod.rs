@@ -11,10 +11,10 @@ impl Plugin for SimulationDiagnosticsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_plugin(TimeStepDiagnosticsPlugin::default())
-            .add_plugin(LogDiagnosticsPlugin::filtered(vec![
-                FrameTimeDiagnosticsPlugin::FPS,
-                TimeStepDiagnosticsPlugin::SPS,
-            ]))
+            // .add_plugin(LogDiagnosticsPlugin::filtered(vec![
+            //     FrameTimeDiagnosticsPlugin::FPS,
+            //     TimeStepDiagnosticsPlugin::SPS,
+            // ]))
             // .add_plugin(LogDiagnosticsPlugin::default())
             .add_startup_system(text::diagnostics_text_setup)
             .add_system(text::diagnostics_text_update)
