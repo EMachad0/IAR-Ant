@@ -1,6 +1,7 @@
 mod text;
 
 use bevy::app::{App, Plugin};
+#[allow(unused_imports)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 use crate::timestep::diagnostic::TimeStepDiagnosticsPlugin;
