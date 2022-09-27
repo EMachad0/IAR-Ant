@@ -21,8 +21,8 @@ pub fn ant_spawn(
         shape::Capsule {
             radius: ANT_RADIUS,
             depth: ANT_HEIGHT,
-            latitudes: 8,
-            longitudes: 16,
+            latitudes: 4,
+            longitudes: 8,
             ..default()
         }
         .into(),

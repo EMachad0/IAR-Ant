@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::consts::{FOOD_RADIUS, ITEM_COUNT};
+use crate::consts::{ITEM_RADIUS, ITEM_COUNT, ITEM_SUBDIVISIONS};
 use crate::IcoBoard;
 
 #[derive(Component)]
@@ -23,8 +23,8 @@ pub fn item_spawn(
     }
 
     let item_mesh = meshes.add(Mesh::from(shape::Icosphere {
-        radius: FOOD_RADIUS,
-        subdivisions: 1,
+        radius: ITEM_RADIUS,
+        subdivisions: ITEM_SUBDIVISIONS,
     }));
     let item_material = materials.add(Color::RED.into());
 
