@@ -3,6 +3,7 @@ use crate::BoardPosition;
 pub use bevy::prelude::*;
 use bevy::render::mesh::{Indices, VertexAttributeValues};
 use bevy_inspector_egui::Inspectable;
+use hexasphere::AdjacentStore;
 use rand::prelude::SliceRandom;
 use rand::Rng;
 
@@ -17,7 +18,6 @@ pub struct IcoBoard {
     pub adj: Vec<Vec<usize>>,
     pub vertex: Vec<[f32; 3]>,
     pub indices: Vec<u32>,
-    pub position: Vec<[f32; 3]>,
     pub cells: Vec<Cell>,
 }
 
@@ -41,7 +41,7 @@ impl IcoBoard {
     }
 
     pub fn world_position(&self, pos: &BoardPosition) -> [f32; 3] {
-        self.position[pos.idx()]
+        self.vertex[pos.idx()]
     }
 
     pub fn get_all_adjacent(&self, pos: &BoardPosition) -> Vec<BoardPosition> {
@@ -78,52 +78,26 @@ pub fn icosphere_setup(
         Indices::U16(_) => panic!("Unexpected U16 indices"),
     };
 
-    let centers: Vec<[f32; 3]> = indices
-        .chunks_exact(3)
-        .map(|idx| {
-            let p1 = vertex[idx[0] as usize];
-            let p2 = vertex[idx[1] as usize];
-            let p3 = vertex[idx[2] as usize];
-            let x = (p1[0] + p2[0] + p3[0]) / 3.;
-            let y = (p1[1] + p2[1] + p3[1]) / 3.;
-            let z = (p1[2] + p2[2] + p3[2]) / 3.;
-            [x, y, z]
+    let adj_store = AdjacentStore::from_indices(indices);
+    let adj = (0..vertex.len())
+        .map(|i| {
+            adj_store
+                .neighbours(i as u32)
+                .unwrap()
+                .iter()
+                .map(|i| *i as usize)
+                .collect()
         })
         .collect();
 
-    let adj = {
-        let mut triangle_per_vertex = vec![vec![]; vertex.len()];
-        indices.chunks_exact(3).enumerate().for_each(|(i, idx)| {
-            triangle_per_vertex[idx[0] as usize].push(i);
-            triangle_per_vertex[idx[1] as usize].push(i);
-            triangle_per_vertex[idx[2] as usize].push(i);
-        });
+    info!("Board with {} positions!", vertex.len());
 
-        let mut adj = vec![vec![]; centers.len()];
-        for triangles in triangle_per_vertex {
-            for i in 0..triangles.len() {
-                for j in 0..triangles.len() {
-                    if i != j {
-                        adj[triangles[i]].push(triangles[j]);
-                    }
-                }
-            }
-        }
-
-        adj.iter_mut().for_each(|v| v.sort_unstable());
-        adj.iter_mut().for_each(|v| v.dedup());
-        adj
-    };
-
-    info!("Board with {} triangles!", centers.len());
-
-    let cells = vec![Cell::default(); centers.len()];
+    let cells = vec![Cell::default(); vertex.len()];
 
     commands.insert_resource(IcoBoard {
         adj,
         vertex: vertex.clone(),
         indices: indices.clone(),
-        position: centers,
         cells,
     });
 
