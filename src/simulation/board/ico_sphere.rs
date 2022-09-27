@@ -1,6 +1,5 @@
 use crate::consts::{BOARD_RADIUS, BOARD_SUBDIVISIONS};
 use crate::BoardPosition;
-use bevy::pbr::wireframe::Wireframe;
 pub use bevy::prelude::*;
 use bevy::render::mesh::{Indices, VertexAttributeValues};
 use bevy_inspector_egui::Inspectable;
