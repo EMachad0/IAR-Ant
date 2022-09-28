@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS};
+use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, ANT_VIEW_RADIUS};
 use crate::simulation::board::BoardPosition;
 use crate::{IcoBoard, SimulationStatus};
 
@@ -66,17 +66,18 @@ pub fn ant_move(
 
 pub fn ant_pickup_drop(
     status: Res<SimulationStatus>,
-    mut commands: Commands,
+    par_commands: ParallelCommands,
     mut query: Query<(&BoardPosition, &mut Ant)>,
-    mut board: ResMut<IcoBoard>,
+    board: ResMut<IcoBoard>,
 ) {
-    let mut rng = rand::thread_rng();
-    for (pos, mut ant) in &mut query {
+    query.par_for_each_mut(20, |(pos, mut ant)| {
+        let mut rng = rand::thread_rng();
+        // for (pos, mut ant) in &mut query {
         let (empty_cells, food_cells) = {
             let mut empty_cells = 0;
             let mut food_cells = 0;
-            for lookup_pos in board.get_all_adjacent(pos) {
-                match board.get_cell(&lookup_pos).food {
+            for lookup_pos in board.get_all_adjacent(pos, ANT_VIEW_RADIUS) {
+                match board.get_cell(&lookup_pos).read().food {
                     None => empty_cells += 1,
                     Some(_) => food_cells += 1,
                 }
@@ -87,22 +88,30 @@ pub fn ant_pickup_drop(
         let threshold = 100. / 80.;
         let prob = (ratio * threshold).min(1.);
 
-        match (board.get_cell(pos).food, ant.item) {
-            (Some(item), None) => {
-                if !status.ending && rng.gen_bool(1. - prob) {
-                    commands.entity(item).remove::<BoardPosition>();
-                    ant.item = board.get_cell_mut(pos).food.take();
+        {
+            let lock = board.get_cell(pos);
+            let mut cell = lock.write();
+            match (cell.food, ant.item) {
+                (Some(item), None) => {
+                    if !status.ending && rng.gen_bool(1. - prob) {
+                        par_commands.command_scope(|mut commands| {
+                            commands.entity(item).remove::<BoardPosition>();
+                        });
+                        ant.item = cell.food.take();
+                    }
                 }
-            }
-            (None, Some(item)) => {
-                if rng.gen_bool(prob) {
-                    commands.entity(item).insert(*pos);
-                    board.get_cell_mut(pos).food = ant.item.take();
+                (None, Some(item)) => {
+                    if rng.gen_bool(prob) {
+                        par_commands.command_scope(|mut commands| {
+                            commands.entity(item).insert(*pos);
+                        });
+                        cell.food = ant.item.take();
+                    }
                 }
+                (_, _) => {}
             }
-            (_, _) => {}
         }
-    }
+    });
 }
 
 pub fn ant_texture_update(

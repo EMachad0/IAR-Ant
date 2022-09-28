@@ -23,10 +23,10 @@ pub struct AntInspector {
 //     foods: InspectorQuery<Entity, With<Food>>,
 // }
 
-#[derive(Default, Inspectable)]
-pub struct BoardInspector {
-    board: ResourceInspector<IcoBoard>,
-}
+// #[derive(Default, Inspectable)]
+// pub struct BoardInspector {
+//     board: ResourceInspector<IcoBoard>,
+// }
 
 #[derive(Default, Inspectable)]
 pub struct SimulationControlInspector {

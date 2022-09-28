@@ -49,7 +49,7 @@ fn main() {
         .add_plugin(DebugInspectorPlugin)
         .add_plugin(SimulationDiagnosticsPlugin)
         // Register types
-        .register_type::<IcoBoard>()
+        // .register_type::<IcoBoard>()
         .register_type::<Ant>()
         .register_type::<BoardPosition>()
         // Simulation Stage

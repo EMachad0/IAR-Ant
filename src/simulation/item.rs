@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::consts::{ITEM_RADIUS, ITEM_COUNT, ITEM_SUBDIVISIONS};
+use crate::consts::{ITEM_COUNT, ITEM_RADIUS, ITEM_SUBDIVISIONS};
 use crate::IcoBoard;
 
 #[derive(Component)]
@@ -8,7 +8,7 @@ pub struct Item;
 
 pub fn item_spawn(
     mut commands: Commands,
-    mut board: ResMut<IcoBoard>,
+    board: ResMut<IcoBoard>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -31,7 +31,8 @@ pub fn item_spawn(
     for _ in 0..ITEM_COUNT {
         let pos = loop {
             let pos = board.new_random_position();
-            if board.get_cell(&pos).food.is_none() {
+            let cell = board.get_cell(&pos).read().food;
+            if cell.is_none() {
                 break pos;
             }
         };
@@ -51,6 +52,6 @@ pub fn item_spawn(
             .insert(pos)
             .id();
 
-        board.get_cell_mut(&pos).food = Some(id);
+        board.get_cell(&pos).write().food = Some(id);
     }
 }

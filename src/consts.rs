@@ -11,6 +11,7 @@ pub const BOARD_RADIUS: f32 = 5.0;
 pub const ANT_COUNT: usize = 100;
 pub const ANT_RADIUS: f32 = 0.06;
 pub const ANT_HEIGHT: f32 = 0.5;
+pub const ANT_VIEW_RADIUS: u32 = 1;
 
 // Food
 pub const ITEM_SUBDIVISIONS: usize = 2;
