@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS};
+use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, BOARD_RADIUS};
 use crate::simulation::board::BoardPosition;
 use crate::{IcoBoard, SimulationStatus};
+
+const TRANSLATION_MULTIPLIER: f32 = 1. + (ANT_HEIGHT + 2. * ANT_RADIUS) / (2. * BOARD_RADIUS);
 
 #[derive(Default, Component, Reflect)]
 #[reflect(Component)]
@@ -114,5 +116,18 @@ pub fn ant_texture_update(
             Some(_) => *material = materials.add(Color::CRIMSON.into()),
             None => *material = materials.add(Color::BLACK.into()),
         }
+    }
+}
+
+pub fn ant_position_update(
+    mut query: Query<(&mut Transform, &BoardPosition), (Changed<BoardPosition>, With<Ant>)>,
+    board: Res<IcoBoard>,
+) {
+    for (mut transform, pos) in &mut query {
+        let mut translation: Vec3 = board.world_position(pos).into();
+        translation *= TRANSLATION_MULTIPLIER;
+        transform.translation = translation;
+        transform.rotation =
+            Quat::from_rotation_arc(Vec3::Y, Vec3::from(board.world_position(&pos)).normalize());
     }
 }

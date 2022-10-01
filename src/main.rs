@@ -72,11 +72,12 @@ fn main() {
         .add_startup_system(simulation::item::item_spawn)
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
+        .add_system(simulation::ant::ant_position_update)
         .add_system(
-            simulation::board::update_removed_board_position
-                .before(simulation::board::update_board_position),
+            simulation::item::item_pickup_update
+                .before(simulation::item::item_position_update),
         )
-        .add_system(simulation::board::update_board_position)
+        .add_system(simulation::item::item_position_update)
         .add_system(simulation::control::simulation_pause_input_handler)
         .add_system(simulation::control::simulation_ending_input_handler)
         .add_system(simulation::control::wireframe_input_handler)

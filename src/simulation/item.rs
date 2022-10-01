@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use crate::consts::{ITEM_RADIUS, ITEM_COUNT, ITEM_SUBDIVISIONS};
-use crate::IcoBoard;
+use crate::consts::{ITEM_COUNT, ITEM_RADIUS, ITEM_SUBDIVISIONS};
+use crate::{BoardPosition, IcoBoard};
 
 #[derive(Component)]
 pub struct Item;
@@ -52,5 +52,32 @@ pub fn item_spawn(
             .id();
 
         board.get_cell_mut(&pos).food = Some(id);
+    }
+}
+
+pub fn item_position_update(
+    mut query: Query<
+        (&mut Transform, &mut Visibility, &BoardPosition),
+        (Changed<BoardPosition>, With<Item>),
+    >,
+    board: Res<IcoBoard>,
+) {
+    for (mut transform, mut visibility, pos) in &mut query {
+        transform.translation = board.world_position(pos).into();
+        visibility.is_visible = true;
+    }
+}
+
+pub fn item_pickup_update(
+    removals: RemovedComponents<BoardPosition>,
+    mut query: Query<&mut Visibility>,
+) {
+    for entity in removals.iter() {
+        let mut visibility = query.get_mut(entity).unwrap_or_else(|_| {
+            let error_message = "Could not find BoardEntity with removed BoardPosition";
+            error!("{error_message}");
+            panic!("{error_message}");
+        });
+        visibility.is_visible = false;
     }
 }
