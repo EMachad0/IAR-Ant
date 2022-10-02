@@ -4,6 +4,7 @@ use rand::Rng;
 use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, BOARD_RADIUS};
 use crate::simulation::board::BoardPosition;
 use crate::{IcoBoard, SimulationStatus};
+use super::prob::probability_function;
 
 const TRANSLATION_MULTIPLIER: f32 = 1. + (ANT_HEIGHT + 2. * ANT_RADIUS) / (2. * BOARD_RADIUS);
 
@@ -86,8 +87,7 @@ pub fn ant_pickup_drop(
             (empty_cells as f64, food_cells as f64)
         };
         let ratio = food_cells / (food_cells + empty_cells);
-        let threshold = 100. / 80.;
-        let prob = (ratio * threshold).min(1.);
+        let prob = probability_function(ratio);
 
         match (board.get_cell(pos).food, ant.item) {
             (Some(item), None) => {

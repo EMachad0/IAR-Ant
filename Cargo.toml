@@ -2,6 +2,7 @@
 name = "ant"
 version = "0.1.0"
 edition = "2021"
+default-run = "ant"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,6 +11,7 @@ bevy = { version = "0.8.1", features = ["dynamic", "bevy_ui", "bevy_text"] }
 bevy-inspector-egui = "0.12.1"
 hexasphere = { version = "7.2.1", features = ["adjacency"] }
 iyes_loopless = { version = "0.7.1", features = ["app", "states", "bevy-inspector-egui"], default-features=false}
+plotters = "0.3.4"
 rand = "0.8.5"
 
 [profile.dev]
