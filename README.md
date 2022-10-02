@@ -19,11 +19,14 @@ O gráfico abaixo mostra a relação entre a razão de items visiveis e a probab
 Foram realizadas três simulações
 
 Uma com raio um (6 células visiveis)
+
 ![raio-1.gif](assets/gif/raio-1.gif)
 
 Uma com raio dois (19 células visiveis)
+
 ![raio-2.gif](assets/gif/raio-2.gif)
 
 Uma com raio três (31 células visiveis)
+
 ![raio-3.gif](assets/gif/raio-3.gif)
 
