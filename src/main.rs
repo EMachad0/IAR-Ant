@@ -1,11 +1,14 @@
+mod camera;
 mod consts;
 mod diagnostics;
 mod inspector;
 mod simulation;
 mod timestep;
 
+use crate::camera::CameraPlugin;
+use bevy::pbr::wireframe::WireframePlugin;
 use bevy::prelude::*;
-use bevy::render::camera::WindowOrigin;
+use bevy::render::settings::{WgpuFeatures, WgpuSettings};
 use bevy::window::PresentMode;
 use iyes_loopless::prelude::*;
 use std::time::Duration;
@@ -14,7 +17,7 @@ use crate::consts::{STARTING_UPS, WINDOW_SIZE};
 use crate::diagnostics::SimulationDiagnosticsPlugin;
 use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
-use crate::simulation::board::{Board, BoardPosition};
+use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
 use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
 use crate::timestep::FixedUpdateLabel;
@@ -22,7 +25,7 @@ use crate::timestep::FixedUpdateLabel;
 fn main() {
     App::new()
         // Resources
-        .insert_resource(ClearColor(Color::DARK_GREEN))
+        .insert_resource(ClearColor(Color::WHITE))
         .insert_resource(WindowDescriptor {
             title: "Ant!".to_string(),
             width: WINDOW_SIZE,
@@ -31,17 +34,22 @@ fn main() {
             present_mode: PresentMode::AutoNoVsync,
             ..default()
         })
+        .insert_resource(WgpuSettings {
+            features: WgpuFeatures::POLYGON_MODE_LINE,
+            ..default()
+        })
         .insert_resource(SimulationStatus::default())
         .insert_resource(FixedTimestepConfig::new(Duration::from_secs_f64(
             STARTING_UPS,
         )))
-        .insert_resource(Board::new())
         // Plugins
         .add_plugins(DefaultPlugins)
+        .add_plugin(WireframePlugin)
+        .add_plugin(CameraPlugin)
         .add_plugin(DebugInspectorPlugin)
         .add_plugin(SimulationDiagnosticsPlugin)
         // Register types
-        .register_type::<Board>()
+        .register_type::<IcoBoard>()
         .register_type::<Ant>()
         .register_type::<BoardPosition>()
         // Simulation Stage
@@ -59,27 +67,22 @@ fn main() {
             ),
         )
         // Setup
-        .add_startup_system(add_camera)
-        .add_startup_system(simulation::board::board_setup)
+        .add_startup_system_to_stage(StartupStage::PreStartup, simulation::board::icosphere_setup)
         .add_startup_system(simulation::ant::ant_spawn)
-        .add_startup_system(simulation::food::food_spawn)
+        .add_startup_system(simulation::item::item_spawn)
+        .add_startup_system(simulation::ant::draw_probability_function)
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
-        .add_system(simulation::board::update_removed_board_position.label("remove_board_position"))
-        .add_system(simulation::board::update_board_position.after("remove_board_position"))
+        .add_system(simulation::ant::ant_position_update)
+        .add_system(
+            simulation::item::item_pickup_update
+                .before(simulation::item::item_position_update),
+        )
+        .add_system(simulation::item::item_position_update)
         .add_system(simulation::control::simulation_pause_input_handler)
         .add_system(simulation::control::simulation_ending_input_handler)
+        .add_system(simulation::control::wireframe_input_handler)
         .add_system(timestep::control::timestep_input_handler)
         // Run
         .run();
-}
-
-fn add_camera(mut commands: Commands) {
-    commands.spawn_bundle(Camera2dBundle {
-        projection: OrthographicProjection {
-            window_origin: WindowOrigin::BottomLeft,
-            ..default()
-        },
-        ..default()
-    });
 }
