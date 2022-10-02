@@ -8,7 +8,7 @@ Simulation of Ant based clustering using Rust and Bevy.
 
 Para cada individuo a probabilidade de pegar ou largar um item foi calculada da seguinte maneira:
 
-![equation.png](assets/img/equation.png)
+![equation.png](assets/img/equation.pt.png)
 
 O gráfico abaixo mostra a relação entre a razão de items visiveis e a probabilidade
 
