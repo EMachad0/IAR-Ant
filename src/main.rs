@@ -4,6 +4,7 @@ mod diagnostics;
 mod inspector;
 mod simulation;
 mod timestep;
+mod dataset;
 
 use crate::camera::CameraPlugin;
 use bevy::pbr::wireframe::WireframePlugin;
@@ -21,6 +22,7 @@ use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
 use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
 use crate::timestep::FixedUpdateLabel;
+use crate::dataset::DatasetPlugin;
 
 fn main() {
     App::new()
@@ -48,6 +50,7 @@ fn main() {
         .add_plugin(CameraPlugin)
         .add_plugin(DebugInspectorPlugin)
         .add_plugin(SimulationDiagnosticsPlugin)
+        .add_plugin(DatasetPlugin)
         // Register types
         .register_type::<IcoBoard>()
         .register_type::<Ant>()
