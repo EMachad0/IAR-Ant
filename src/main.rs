@@ -72,11 +72,11 @@ fn main() {
         // Setup
         .add_startup_system_to_stage(StartupStage::PreStartup, simulation::board::icosphere_setup)
         .add_startup_system(simulation::ant::ant_spawn)
-        .add_startup_system(simulation::item::item_spawn)
         .add_startup_system(simulation::ant::draw_probability_function)
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
         .add_system(simulation::ant::ant_position_update)
+        .add_system(simulation::item::item_spawn_on_dataset_load)
         .add_system(
             simulation::item::item_pickup_update
                 .before(simulation::item::item_position_update),

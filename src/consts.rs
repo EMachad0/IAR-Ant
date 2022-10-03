@@ -15,4 +15,3 @@ pub const ANT_HEIGHT: f32 = 0.2;
 // Food
 pub const ITEM_SUBDIVISIONS: usize = 2;
 pub const ITEM_RADIUS: f32 = 0.2;
-pub const ITEM_COUNT: usize = 1000;
