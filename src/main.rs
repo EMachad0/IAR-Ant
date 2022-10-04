@@ -21,8 +21,8 @@ use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
 use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
+use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
-use crate::timestep::{FixedTimestepStage, FixedTimestepStageLabel};
 
 fn main() {
     App::new()

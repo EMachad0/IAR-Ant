@@ -12,6 +12,10 @@ pub fn is_simulation_paused(status: Res<SimulationStatus>) -> bool {
     status.paused
 }
 
+pub fn is_simulation_paused_or_ending(status: Res<SimulationStatus>) -> bool {
+    status.paused || status.ending
+}
+
 pub fn simulation_pause_input_handler(
     kbd: Res<Input<KeyCode>>,
     mut status: ResMut<SimulationStatus>,

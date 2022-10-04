@@ -32,7 +32,7 @@ impl TimeStepDiagnosticsPlugin {
 
     pub fn setup_system(mut diagnostics: ResMut<Diagnostics>) {
         diagnostics.add(Diagnostic::new(Self::STEP_TIME, "step_time", 20).with_suffix("s"));
-        diagnostics.add(Diagnostic::new(Self::SPS, "sps", 20));
+        diagnostics.add(Diagnostic::new(Self::SPS, "sps", 1));
         diagnostics.add(Diagnostic::new(Self::STEP_COUNT, "step_count", 1));
         diagnostics.add(Diagnostic::new(Self::OVERSTEP, "overstep", 20));
         diagnostics.add(Diagnostic::new(Self::ACCUMULATOR, "accumulator", 20).with_suffix("s"));
