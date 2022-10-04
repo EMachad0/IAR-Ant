@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use rand::Rng;
 
+use super::group_colors::HIGH_CONTRAST_COLORS;
 use crate::consts::{ITEM_RADIUS, ITEM_SUBDIVISIONS};
 use crate::dataset::{Dataset, DatasetHandle};
-use crate::simulation::item::group_colors::HIGH_CONTRAST_COLORS;
 use crate::{BoardPosition, IcoBoard};
 
 #[derive(Component)]

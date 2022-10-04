@@ -1,5 +1,5 @@
-use std::f64::consts::{FRAC_PI_2};
 use plotters::prelude::*;
+use std::f64::consts::FRAC_PI_2;
 
 /// # parameters
 /// ratio = Food divided by total cells

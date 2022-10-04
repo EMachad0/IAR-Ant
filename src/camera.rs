@@ -1,6 +1,7 @@
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
 use bevy::render::camera::Projection;
+
 use crate::consts::CAMERA_DISTANCE;
 
 pub struct CameraPlugin;

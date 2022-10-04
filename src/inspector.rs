@@ -3,9 +3,8 @@ use bevy::prelude::*;
 pub struct DebugInspectorPlugin;
 
 use crate::simulation::ant::Ant;
-// use crate::simulation::food::Food;
-use crate::timestep::FixedTimestepConfig;
 use crate::simulation::board::IcoBoard;
+use crate::timestep::FixedTimestepConfig;
 
 #[allow(unused_imports)]
 use bevy_inspector_egui::{
