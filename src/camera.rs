@@ -9,26 +9,8 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_camera)
-            .add_startup_system(spawn_light)
             .add_system(pan_orbit_camera);
     }
-}
-
-pub fn spawn_light(mut commands: Commands) {
-    commands.insert_resource(AmbientLight {
-        color: Color::WHITE,
-        brightness: 0.3,
-    });
-
-    commands.spawn_bundle(PointLightBundle {
-        point_light: PointLight {
-            intensity: 1500.0,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
 }
 
 /// Tags an entity as capable of panning and orbiting.

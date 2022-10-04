@@ -20,8 +20,8 @@ impl Plugin for SimulationDiagnosticsPlugin {
             .add_plugin(TimeStepDiagnosticsPlugin::default())
             .add_plugin(SimulationTimeDiagnosticsPlugin::default())
             .add_plugin(LogDiagnosticsPlugin::filtered(vec![
-                SimulationTimeDiagnosticsPlugin::ELAPSED_TIME,
-                SimulationTimeDiagnosticsPlugin::UPDATE_COUNT,
+                // SimulationTimeDiagnosticsPlugin::ELAPSED_TIME,
+                // SimulationTimeDiagnosticsPlugin::UPDATE_COUNT,
             ]))
             // .add_plugin(LogDiagnosticsPlugin::default())
             .add_startup_system(text::diagnostics_text_setup)

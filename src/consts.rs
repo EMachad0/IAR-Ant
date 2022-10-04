@@ -15,3 +15,6 @@ pub const ANT_HEIGHT: f32 = 0.2;
 // Food
 pub const ITEM_SUBDIVISIONS: usize = 2;
 pub const ITEM_RADIUS: f32 = 0.2;
+
+// Light
+pub const SUN_DISTANCE: f32 = 9.0;

@@ -21,6 +21,7 @@ use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
 use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
+use crate::simulation::light::LightPlugin;
 use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
 
@@ -51,6 +52,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)
+        .add_plugin(LightPlugin)
         .add_plugin(DebugInspectorPlugin)
         .add_plugin(SimulationDiagnosticsPlugin)
         .add_plugin(DatasetPlugin)
