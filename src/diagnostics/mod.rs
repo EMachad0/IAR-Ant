@@ -23,10 +23,9 @@ impl Plugin for SimulationDiagnosticsPlugin {
             .add_system(text::diagnostics_text_update)
             .add_system(text::toggle_diagnostics_text_visibility)
             .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
-                stage.add_stage(
-                    SystemStage::parallel()
-                        .with_system(TimeStepDiagnosticsPlugin::diagnostic_system),
-                );
+                stage
+                    .get_system_stage(1)
+                    .add_system(TimeStepDiagnosticsPlugin::diagnostic_system);
                 stage
             });
     }

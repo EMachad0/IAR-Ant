@@ -43,7 +43,7 @@ pub struct FixedTimestepInfo {
 pub struct FixedTimestepStage {
     step: Duration,
     accumulator: Duration,
-    stages: Vec<Box<dyn Stage>>,
+    pub stages: Vec<Box<dyn Stage>>,
 }
 
 impl FixedTimestepStage {
@@ -53,12 +53,20 @@ impl FixedTimestepStage {
     }
 
     /// Create a new empty `FixedTimestepStage` with no child stages
-    pub fn new(timestep: Duration) -> Self {
+    pub fn empty(timestep: Duration) -> Self {
         Self {
             step: timestep,
             accumulator: Duration::default(),
             stages: Vec::new(),
         }
+    }
+
+    /// Create a new `FixedTimestepStage`
+    pub fn new(timestep: Duration) -> Self {
+        Self::empty(timestep)
+            .with_stage(SystemStage::parallel())
+            .with_stage(SystemStage::parallel())
+            .with_stage(SystemStage::parallel())
     }
 
     /// Add a child stage
@@ -72,11 +80,10 @@ impl FixedTimestepStage {
         self
     }
 
-    /// Create a new empty `FixedTimestepStage` with no child stages
-    /// Duration is set to zero
-    /// Useful when using [`FixedTimestepConfig`]
-    pub fn empty() -> Self {
-        Self::new(Duration::ZERO)
+    pub fn get_system_stage(&mut self, idx: usize) -> &mut SystemStage {
+        self.stages[idx]
+            .downcast_mut::<SystemStage>()
+            .expect("Its is not a system stage")
     }
 }
 

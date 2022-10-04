@@ -21,8 +21,8 @@ use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
 use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
-use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
+use crate::timestep::{FixedTimestepStage, FixedTimestepStageLabel};
 
 fn main() {
     App::new()
@@ -64,14 +64,12 @@ fn main() {
         .add_startup_system(simulation::ant::draw_probability_function)
         // FixedTimeStep Systems
         .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
-            stage.add_stage(
-                SystemStage::parallel().with_system_set(
-                    ConditionSet::new()
-                        .run_if_not(simulation::control::is_simulation_paused)
-                        .with_system(simulation::ant::ant_move)
-                        .with_system(simulation::ant::ant_pickup_drop)
-                        .into(),
-                ),
+            stage.get_system_stage(1).add_system_set(
+                ConditionSet::new()
+                    .run_if_not(simulation::control::is_simulation_paused)
+                    .with_system(simulation::ant::ant_move)
+                    .with_system(simulation::ant::ant_pickup_drop)
+                    .into(),
             );
             stage
         })
