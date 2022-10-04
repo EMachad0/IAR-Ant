@@ -21,6 +21,7 @@ use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
 use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
+use crate::simulation::info::SimulationInfo;
 use crate::simulation::light::LightPlugin;
 use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
@@ -41,7 +42,8 @@ fn main() {
             features: WgpuFeatures::POLYGON_MODE_LINE,
             ..default()
         })
-        .insert_resource(SimulationStatus::default())
+        .init_resource::<SimulationStatus>()
+        .init_resource::<SimulationInfo>()
         // Simulation Stage
         .add_stage_before(
             CoreStage::Update,
@@ -66,13 +68,19 @@ fn main() {
         .add_startup_system(simulation::ant::draw_probability_function)
         // FixedTimeStep Systems
         .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
-            stage.get_system_stage(1).add_system_set(
-                ConditionSet::new()
-                    .run_if_not(simulation::control::is_simulation_paused)
-                    .with_system(simulation::ant::ant_move)
-                    .with_system(simulation::ant::ant_pickup_drop)
-                    .into(),
-            );
+            stage
+                .get_system_stage(1)
+                .add_system_set(
+                    ConditionSet::new()
+                        .run_if_not(simulation::control::is_simulation_paused)
+                        .with_system(simulation::ant::ant_move)
+                        .with_system(simulation::ant::ant_pickup_drop)
+                        .into(),
+                )
+                .add_system(
+                    simulation::info::simulation_info_update
+                        .run_if_not(simulation::control::is_simulation_paused_or_ending),
+                );
             stage
         })
         // Per Frame Systems

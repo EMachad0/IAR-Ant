@@ -47,3 +47,9 @@ pub fn wireframe_input_handler(
         };
     }
 }
+
+pub fn auto_pause(
+    
+) {
+    
+}

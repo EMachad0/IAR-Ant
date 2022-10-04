@@ -1,9 +1,9 @@
-use crate::consts::SUN_DISTANCE;
-use crate::diagnostics::simulation_time_diagnostic::SimulationTimeDiagnosticsPlugin;
-use bevy::diagnostic::Diagnostics;
 use bevy::math::vec3;
 use bevy::prelude::*;
 use std::f32::consts::PI;
+
+use crate::consts::SUN_DISTANCE;
+use crate::simulation::info::SimulationInfo;
 
 pub struct LightPlugin;
 
@@ -36,15 +36,8 @@ pub fn spawn_light(mut commands: Commands) {
         .insert(Sun);
 }
 
-pub fn sun_position_update(
-    mut query: Query<&mut Transform, With<Sun>>,
-    diagnostics: Res<Diagnostics>,
-) {
+pub fn sun_position_update(mut query: Query<&mut Transform, With<Sun>>, info: Res<SimulationInfo>) {
     let mut transform = query.get_single_mut().expect("Unable to find Sun");
-    if let Some(diagnostic) = diagnostics.get(SimulationTimeDiagnosticsPlugin::UPDATE_COUNT) {
-        if let Some(value) = diagnostic.value() {
-            let angle = value as f32 / 360.0 * (2. * PI);
-            transform.translation = vec3(angle.cos(), angle.sin(), 0.0) * SUN_DISTANCE;
-        }
-    }
+    let angle = info.update_count as f32 / 360.0 * (2. * PI);
+    transform.translation = vec3(angle.cos(), angle.sin(), 0.0) * SUN_DISTANCE;
 }
