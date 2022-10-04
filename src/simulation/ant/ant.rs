@@ -1,12 +1,17 @@
 use bevy::prelude::*;
+use bevy::reflect::TypeUuid;
 use rand::Rng;
 
+use super::prob::probability_function;
 use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, BOARD_RADIUS};
 use crate::simulation::board::BoardPosition;
+use crate::simulation::item::Item;
 use crate::{IcoBoard, SimulationStatus};
-use super::prob::probability_function;
 
 const TRANSLATION_MULTIPLIER: f32 = 1. + (ANT_HEIGHT + 2. * ANT_RADIUS) / (2. * BOARD_RADIUS);
+
+pub const ANT_MATERIAL: HandleUntyped =
+    HandleUntyped::weak_from_u64(StandardMaterial::TYPE_UUID, 536721377579319359);
 
 #[derive(Default, Component, Reflect)]
 #[reflect(Component)]
@@ -20,6 +25,8 @@ pub fn ant_spawn(
     mut materials: ResMut<Assets<StandardMaterial>>,
     board: Res<IcoBoard>,
 ) {
+    materials.set_untracked(ANT_MATERIAL, Color::BLACK.into());
+
     let ant_mesh = meshes.add(
         shape::Capsule {
             radius: ANT_RADIUS,
@@ -30,7 +37,7 @@ pub fn ant_spawn(
         }
         .into(),
     );
-    let ant_material = materials.add(Color::BLACK.into());
+
     for _ in 0..ANT_COUNT {
         let pos = board.new_random_position();
 
@@ -38,7 +45,7 @@ pub fn ant_spawn(
             .spawn()
             .insert_bundle(PbrBundle {
                 mesh: ant_mesh.clone(),
-                material: ant_material.clone(),
+                material: ANT_MATERIAL.typed_weak(),
                 transform: Transform {
                     translation: board.world_position(&pos).into(),
                     rotation: Quat::from_rotation_arc(
@@ -108,13 +115,13 @@ pub fn ant_pickup_drop(
 }
 
 pub fn ant_texture_update(
-    mut query: Query<(&mut Handle<StandardMaterial>, &Ant), Changed<Ant>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut query: Query<(&mut Handle<StandardMaterial>, &Ant), (Changed<Ant>, Without<Item>)>,
+    item_query: Query<&Handle<StandardMaterial>, With<Item>>,
 ) {
     for (mut material, ant) in &mut query {
         match ant.item {
-            Some(_) => *material = materials.add(Color::CRIMSON.into()),
-            None => *material = materials.add(Color::BLACK.into()),
+            Some(entity) => *material = item_query.get(entity).unwrap().clone(),
+            None => *material = ANT_MATERIAL.typed_weak(),
         }
     }
 }
