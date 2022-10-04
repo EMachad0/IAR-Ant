@@ -1,12 +1,11 @@
 mod camera;
 mod consts;
+mod dataset;
 mod diagnostics;
 mod inspector;
 mod simulation;
 mod timestep;
-mod dataset;
 
-use crate::camera::CameraPlugin;
 use bevy::pbr::wireframe::WireframePlugin;
 use bevy::prelude::*;
 use bevy::render::settings::{WgpuFeatures, WgpuSettings};
@@ -14,15 +13,16 @@ use bevy::window::PresentMode;
 use iyes_loopless::prelude::*;
 use std::time::Duration;
 
+use crate::camera::CameraPlugin;
 use crate::consts::{STARTING_UPS, WINDOW_SIZE};
+use crate::dataset::DatasetPlugin;
 use crate::diagnostics::SimulationDiagnosticsPlugin;
 use crate::inspector::DebugInspectorPlugin;
 use crate::simulation::ant::Ant;
 use crate::simulation::board::{BoardPosition, IcoBoard};
 use crate::simulation::control::SimulationStatus;
-use crate::timestep::fixed_timestep::{FixedTimestepConfig, FixedTimestepStage};
+use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
-use crate::dataset::DatasetPlugin;
 
 fn main() {
     App::new()
@@ -41,9 +41,12 @@ fn main() {
             ..default()
         })
         .insert_resource(SimulationStatus::default())
-        .insert_resource(FixedTimestepConfig::new(Duration::from_secs_f64(
-            STARTING_UPS,
-        )))
+        // Simulation Stage
+        .add_stage_before(
+            CoreStage::Update,
+            FixedUpdateLabel,
+            FixedTimestepStage::new(Duration::from_secs_f64(STARTING_UPS)),
+        )
         // Plugins
         .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
@@ -55,11 +58,13 @@ fn main() {
         .register_type::<IcoBoard>()
         .register_type::<Ant>()
         .register_type::<BoardPosition>()
-        // Simulation Stage
-        .add_stage_before(
-            CoreStage::Update,
-            FixedUpdateLabel,
-            FixedTimestepStage::empty().with_stage(
+        // Setup
+        .add_startup_system_to_stage(StartupStage::PreStartup, simulation::board::icosphere_setup)
+        .add_startup_system(simulation::ant::ant_spawn)
+        .add_startup_system(simulation::ant::draw_probability_function)
+        // FixedTimeStep Systems
+        .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
+            stage.add_stage(
                 SystemStage::parallel().with_system_set(
                     ConditionSet::new()
                         .run_if_not(simulation::control::is_simulation_paused)
@@ -67,19 +72,15 @@ fn main() {
                         .with_system(simulation::ant::ant_pickup_drop)
                         .into(),
                 ),
-            ),
-        )
-        // Setup
-        .add_startup_system_to_stage(StartupStage::PreStartup, simulation::board::icosphere_setup)
-        .add_startup_system(simulation::ant::ant_spawn)
-        .add_startup_system(simulation::ant::draw_probability_function)
+            );
+            stage
+        })
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
         .add_system(simulation::ant::ant_position_update)
         .add_system(simulation::item::item_spawn_on_dataset_load)
         .add_system(
-            simulation::item::item_pickup_update
-                .before(simulation::item::item_position_update),
+            simulation::item::item_pickup_update.before(simulation::item::item_position_update),
         )
         .add_system(simulation::item::item_position_update)
         .add_system(simulation::control::simulation_pause_input_handler)

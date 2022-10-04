@@ -1,7 +1,7 @@
 use bevy::diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin};
 use bevy::prelude::*;
 
-use crate::timestep::diagnostic::TimeStepDiagnosticsPlugin;
+use super::timestep_diagnostic::TimeStepDiagnosticsPlugin;
 
 #[derive(Component)]
 pub struct DiagnosticsText;

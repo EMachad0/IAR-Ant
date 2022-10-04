@@ -1,5 +1,8 @@
 use bevy::diagnostic::{Diagnostic, DiagnosticId, Diagnostics};
-use crate::{App, Plugin, ResMut};
+use bevy::prelude::*;
+use std::time::Duration;
+
+use crate::timestep::FixedTimestepInfo;
 
 /// Adds "fixed_timestep" diagnostic to an App, specifically "step time", "sps", "step count", "overstep" and "accumulator"
 #[derive(Default)]
@@ -33,5 +36,29 @@ impl TimeStepDiagnosticsPlugin {
         diagnostics.add(Diagnostic::new(Self::STEP_COUNT, "step_count", 1));
         diagnostics.add(Diagnostic::new(Self::OVERSTEP, "overstep", 20));
         diagnostics.add(Diagnostic::new(Self::ACCUMULATOR, "accumulator", 20).with_suffix("s"));
+    }
+
+    pub fn diagnostic_system(
+        mut diagnostics: ResMut<Diagnostics>,
+        mut state: ResMut<TimeStepDiagnosticsState>,
+        info: Res<FixedTimestepInfo>,
+    ) {
+        let FixedTimestepInfo { step, accumulator } = *info;
+
+        diagnostics.add_measurement(TimeStepDiagnosticsPlugin::STEP_COUNT, || {
+            state.update_count = state.update_count.wrapping_add(1);
+            state.update_count as f64
+        });
+        diagnostics.add_measurement(TimeStepDiagnosticsPlugin::STEP_TIME, || step.as_secs_f64());
+        diagnostics.add_measurement(TimeStepDiagnosticsPlugin::ACCUMULATOR, || {
+            accumulator.as_secs_f64()
+        });
+        if step > Duration::ZERO {
+            diagnostics
+                .add_measurement(TimeStepDiagnosticsPlugin::SPS, || 1.0 / step.as_secs_f64());
+            diagnostics.add_measurement(TimeStepDiagnosticsPlugin::OVERSTEP, || {
+                accumulator.as_secs_f64() / step.as_secs_f64()
+            });
+        }
     }
 }

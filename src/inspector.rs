@@ -4,7 +4,7 @@ pub struct DebugInspectorPlugin;
 
 use crate::simulation::ant::Ant;
 // use crate::simulation::food::Food;
-use crate::timestep::fixed_timestep::FixedTimestepConfig;
+use crate::timestep::FixedTimestepConfig;
 use crate::simulation::board::IcoBoard;
 
 #[allow(unused_imports)]

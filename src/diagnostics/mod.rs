@@ -1,10 +1,12 @@
 mod text;
+pub mod timestep_diagnostic;
 
-use bevy::app::{App, Plugin};
 #[allow(unused_imports)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::prelude::*;
 
-use crate::timestep::diagnostic::TimeStepDiagnosticsPlugin;
+use crate::timestep::{FixedTimestepStage, FixedUpdateLabel};
+use timestep_diagnostic::TimeStepDiagnosticsPlugin;
 
 pub struct SimulationDiagnosticsPlugin;
 
@@ -19,6 +21,13 @@ impl Plugin for SimulationDiagnosticsPlugin {
             // .add_plugin(LogDiagnosticsPlugin::default())
             .add_startup_system(text::diagnostics_text_setup)
             .add_system(text::diagnostics_text_update)
-            .add_system(text::toggle_diagnostics_text_visibility);
+            .add_system(text::toggle_diagnostics_text_visibility)
+            .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
+                stage.add_stage(
+                    SystemStage::parallel()
+                        .with_system(TimeStepDiagnosticsPlugin::diagnostic_system),
+                );
+                stage
+            });
     }
 }

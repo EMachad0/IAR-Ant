@@ -3,25 +3,29 @@
 
 #![allow(dead_code)]
 
-use bevy::diagnostic::Diagnostics;
 use bevy::prelude::*;
-use std::time::Duration;
 use bevy_inspector_egui::Inspectable;
-
-use crate::timestep::diagnostic::{TimeStepDiagnosticsPlugin, TimeStepDiagnosticsState};
+use std::time::Duration;
 
 /// If you modify the step value, the fixed timestep driver stage will
 /// reconfigure itself to respect it. Your new timestep duration will be
 /// used starting from the next update cycle.
-#[derive(Debug, Inspectable)]
+#[derive(Debug, Default, Inspectable)]
 pub struct FixedTimestepConfig {
-    pub step: Duration,
+    pub step: Option<Duration>,
+    pub accumulator: Option<Duration>,
 }
 
-impl FixedTimestepConfig {
-    pub fn new(step: Duration) -> Self {
-        Self { step }
-    }
+/// This type will be available as a resource, while a fixed timestep stage
+/// runs, to provide info about the current status of the fixed timestep.
+///
+/// If you modify the step value, the fixed timestep driver stage will
+/// reconfigure itself to respect it. Your new timestep duration will be
+/// used starting from the next update cycle.
+#[derive(Debug, Inspectable)]
+pub struct FixedTimestepInfo {
+    pub step: Duration,
+    pub accumulator: Duration,
 }
 
 /// A Stage that runs a number of child stages with a fixed timestep
@@ -79,9 +83,15 @@ impl FixedTimestepStage {
 impl Stage for FixedTimestepStage {
     fn run(&mut self, world: &mut World) {
         if let Some(config) = world.get_resource::<FixedTimestepConfig>() {
-            // update our actual step duration, in case the user has
-            // modified it in the info resource
-            self.step = config.step;
+            // update our actual timestep configuration, in case the user has modified it
+            if let Some(step) = config.step {
+                self.step = step;
+            }
+            if let Some(accumulator) = config.accumulator {
+                self.accumulator = accumulator;
+            }
+
+            world.remove_resource::<FixedTimestepConfig>();
         }
 
         self.accumulator += {
@@ -95,38 +105,13 @@ impl Stage for FixedTimestepStage {
 
         while self.accumulator >= self.step {
             self.accumulator -= self.step;
-            for stage in self.stages.iter_mut() {
-                {
-                    let cell = world.cell();
-                    if let Some(mut diagnostics) = cell.get_resource_mut::<Diagnostics>() {
-                        if let Some(mut state) = cell.get_resource_mut::<TimeStepDiagnosticsState>()
-                        {
-                            diagnostics.add_measurement(
-                                TimeStepDiagnosticsPlugin::STEP_COUNT,
-                                || {
-                                    state.update_count = state.update_count.wrapping_add(1);
-                                    state.update_count as f64
-                                },
-                            );
-                        }
-                        diagnostics.add_measurement(TimeStepDiagnosticsPlugin::STEP_TIME, || {
-                            self.step.as_secs_f64()
-                        });
-                        diagnostics.add_measurement(TimeStepDiagnosticsPlugin::ACCUMULATOR, || {
-                            self.accumulator.as_secs_f64()
-                        });
-                        if self.step > Duration::ZERO {
-                            diagnostics.add_measurement(TimeStepDiagnosticsPlugin::SPS, || {
-                                1.0 / self.step.as_secs_f64()
-                            });
-                            diagnostics
-                                .add_measurement(TimeStepDiagnosticsPlugin::OVERSTEP, || {
-                                    self.accumulator.as_secs_f64() / self.step.as_secs_f64()
-                                });
-                        }
-                    };
-                }
 
+            world.insert_resource(FixedTimestepInfo {
+                step: self.step,
+                accumulator: self.accumulator,
+            });
+
+            for stage in self.stages.iter_mut() {
                 stage.run(world);
             }
         }
