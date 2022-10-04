@@ -1,6 +1,8 @@
-use crate::simulation::board::BoardSphere;
 use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
+
+use crate::simulation::board::BoardSphere;
+use crate::simulation::info::SimulationInfo;
 
 #[derive(Debug, Copy, Clone, Default)]
 pub struct SimulationStatus {
@@ -48,8 +50,8 @@ pub fn wireframe_input_handler(
     }
 }
 
-pub fn auto_pause(
-    
-) {
-    
+pub fn auto_pause(mut status: ResMut<SimulationStatus>, info: Res<SimulationInfo>) {
+    if info.update_count % 1_000_000 == 0 {
+        status.ending = true;
+    }
 }

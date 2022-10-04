@@ -68,19 +68,20 @@ fn main() {
         .add_startup_system(simulation::ant::draw_probability_function)
         // FixedTimeStep Systems
         .stage(FixedUpdateLabel, |stage: &mut FixedTimestepStage| {
+            stage.get_system_stage(0).add_system(
+                simulation::info::simulation_info_update
+                    .run_if_not(simulation::control::is_simulation_paused_or_ending),
+            );
+            stage.get_system_stage(1).add_system_set(
+                ConditionSet::new()
+                    .run_if_not(simulation::control::is_simulation_paused)
+                    .with_system(simulation::ant::ant_move)
+                    .with_system(simulation::ant::ant_pickup_drop)
+                    .into(),
+            );
             stage
-                .get_system_stage(1)
-                .add_system_set(
-                    ConditionSet::new()
-                        .run_if_not(simulation::control::is_simulation_paused)
-                        .with_system(simulation::ant::ant_move)
-                        .with_system(simulation::ant::ant_pickup_drop)
-                        .into(),
-                )
-                .add_system(
-                    simulation::info::simulation_info_update
-                        .run_if_not(simulation::control::is_simulation_paused_or_ending),
-                );
+                .get_system_stage(2)
+                .add_system(simulation::control::auto_pause);
             stage
         })
         // Per Frame Systems
