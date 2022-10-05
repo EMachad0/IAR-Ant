@@ -19,6 +19,6 @@ impl Plugin for DatasetPlugin {
 pub struct DatasetHandle(Handle<Dataset>);
 
 pub fn load_dataset(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let handle = asset_server.load("dataset/dataset_04.txt");
+    let handle = asset_server.load("dataset/dataset_15.txt");
     commands.insert_resource(DatasetHandle(handle));
 }

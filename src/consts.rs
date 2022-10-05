@@ -18,3 +18,6 @@ pub const ITEM_RADIUS: f32 = 0.2;
 
 // Light
 pub const SUN_DISTANCE: f32 = 9.0;
+
+// Probability
+pub const ALPHA: f64 = 5.;

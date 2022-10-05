@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy::reflect::TypeUuid;
 use rand::Rng;
 
-use super::prob::probability_function;
 use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, BOARD_RADIUS};
+use crate::simulation::ant::{drop_probability, pickup_probability};
 use crate::simulation::board::BoardPosition;
 use crate::simulation::item::Item;
 use crate::{IcoBoard, SimulationStatus};
@@ -76,37 +76,29 @@ pub fn ant_move(
 
 pub fn ant_pickup_drop(
     status: Res<SimulationStatus>,
-    mut commands: Commands,
     mut query: Query<(&BoardPosition, &mut Ant)>,
+    mut item_query: Query<(&Item, &mut Visibility)>,
     mut board: ResMut<IcoBoard>,
 ) {
     let mut rng = rand::thread_rng();
     for (pos, mut ant) in &mut query {
-        let (empty_cells, food_cells) = {
-            let mut empty_cells = 0;
-            let mut food_cells = 0;
-            for lookup_pos in board.get_all_adjacent(pos) {
-                match board.get_cell(&lookup_pos).food {
-                    None => empty_cells += 1,
-                    Some(_) => food_cells += 1,
+        match (board.get_cell(pos).item, ant.item) {
+            (Some(entity), None) => {
+                if status.ending {
+                    continue;
                 }
-            }
-            (empty_cells as f64, food_cells as f64)
-        };
-        let ratio = food_cells / (food_cells + empty_cells);
-        let prob = probability_function(ratio);
 
-        match (board.get_cell(pos).food, ant.item) {
-            (Some(item), None) => {
-                if !status.ending && rng.gen_bool(1. - prob) {
-                    commands.entity(item).remove::<BoardPosition>();
-                    ant.item = board.get_cell_mut(pos).food.take();
+                let (item, mut visibility) = item_query.get_mut(entity).unwrap();
+                if rng.gen_bool(pickup_probability(item.similarity)) {
+                    visibility.is_visible = false;
+                    ant.item = board.get_cell_mut(pos).item.take();
                 }
             }
-            (None, Some(item)) => {
-                if rng.gen_bool(prob) {
-                    commands.entity(item).insert(*pos);
-                    board.get_cell_mut(pos).food = ant.item.take();
+            (None, Some(entity)) => {
+                let (item, mut visibility) = item_query.get_mut(entity).unwrap();
+                if rng.gen_bool(drop_probability(item.similarity)) {
+                    visibility.is_visible = true;
+                    board.get_cell_mut(pos).item = ant.item.take();
                 }
             }
             (_, _) => {}
@@ -136,5 +128,16 @@ pub fn ant_position_update(
         transform.translation = translation;
         transform.rotation =
             Quat::from_rotation_arc(Vec3::Y, Vec3::from(board.world_position(&pos)).normalize());
+    }
+}
+
+pub fn ant_carried_item_position_update(
+    mut items: Query<&mut BoardPosition, With<Item>>,
+    ants: Query<(&BoardPosition, &Ant), (Changed<BoardPosition>, Without<Item>)>,
+) {
+    for (pos, ant) in &ants {
+        if let Some(entity) = ant.item {
+            *items.get_mut(entity).unwrap() = *pos;
+        }
     }
 }

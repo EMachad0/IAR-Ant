@@ -1,11 +1,13 @@
 use plotters::prelude::*;
-use std::f64::consts::FRAC_PI_2;
 
-/// # parameters
-/// ratio = Food divided by total cells
-pub fn probability_function(ratio: f64) -> f64 {
-    let prob = (ratio * FRAC_PI_2).sin();
-    prob
+pub fn pickup_probability(similarity: f64) -> f64 {
+    let k1 = 100. / 40.;
+    1. - (similarity * k1).min(1.0)
+}
+
+pub fn drop_probability(similarity: f64) -> f64 {
+    let k2 = 100. / 50.;
+    (similarity * k2).min(1.0)
 }
 
 pub fn draw_probability_function() {
@@ -38,7 +40,7 @@ pub fn draw_probability_function() {
     ctx.draw_series(LineSeries::new(
         (0..=100)
             .map(|x| x as f64 / 100.0)
-            .map(|x| (x, probability_function(x))),
+            .map(|x| (x, drop_probability(x))),
         style,
     ))
     .unwrap()
@@ -63,7 +65,7 @@ pub fn draw_probability_function() {
     ctx.draw_series(LineSeries::new(
         (0..=100)
             .map(|x| x as f64 / 100.0)
-            .map(|x| (x, 1. - probability_function(x))),
+            .map(|x| (x, pickup_probability(x))),
         style,
     ))
     .unwrap()

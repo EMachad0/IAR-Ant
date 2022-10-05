@@ -81,16 +81,18 @@ fn main() {
             );
             stage
                 .get_system_stage(2)
-                .add_system(simulation::control::auto_pause);
+                .add_system(simulation::control::auto_pause)
+                .add_system(simulation::ant::ant_carried_item_position_update)
+                .add_system(
+                    simulation::item::item_similarity_update
+                        .after(simulation::ant::ant_carried_item_position_update),
+                );
             stage
         })
         // Per Frame Systems
         .add_system(simulation::ant::ant_texture_update)
         .add_system(simulation::ant::ant_position_update)
         .add_system(simulation::item::item_spawn_on_dataset_load)
-        .add_system(
-            simulation::item::item_pickup_update.before(simulation::item::item_position_update),
-        )
         .add_system(simulation::item::item_position_update)
         .add_system(simulation::control::simulation_pause_input_handler)
         .add_system(simulation::control::simulation_ending_input_handler)

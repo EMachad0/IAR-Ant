@@ -2,13 +2,22 @@ use bevy::prelude::*;
 use rand::Rng;
 
 use super::group_colors::HIGH_CONTRAST_COLORS;
-use crate::consts::{ITEM_RADIUS, ITEM_SUBDIVISIONS};
+use crate::consts::{ALPHA, ITEM_RADIUS, ITEM_SUBDIVISIONS};
 use crate::dataset::{Dataset, DatasetHandle};
 use crate::{BoardPosition, IcoBoard};
 
 #[derive(Component)]
 pub struct Item {
+    pub similarity: f64,
     pub data: [f32; 2],
+}
+
+impl Item {
+    pub fn dis(&self, other: &Self) -> f64 {
+        let [x1, y1] = self.data;
+        let [x2, y2] = other.data;
+        ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt() as f64
+    }
 }
 
 pub fn item_spawn_on_dataset_load(
@@ -61,7 +70,7 @@ pub fn item_spawn_on_dataset_load(
                     for data in v {
                         let pos = loop {
                             let pos = board.new_random_position();
-                            if board.get_cell(&pos).food.is_none() {
+                            if board.get_cell(&pos).item.is_none() {
                                 break pos;
                             }
                         };
@@ -77,11 +86,14 @@ pub fn item_spawn_on_dataset_load(
                                 },
                                 ..default()
                             })
-                            .insert(Item { data: *data })
+                            .insert(Item {
+                                similarity: 0.0,
+                                data: *data,
+                            })
                             .insert(pos)
                             .id();
 
-                        board.get_cell_mut(&pos).food = Some(id);
+                        board.get_cell_mut(&pos).item = Some(id);
                     }
                 }
             }
@@ -90,29 +102,34 @@ pub fn item_spawn_on_dataset_load(
     }
 }
 
-pub fn item_position_update(
-    mut query: Query<
-        (&mut Transform, &mut Visibility, &BoardPosition),
-        (Changed<BoardPosition>, With<Item>),
-    >,
-    board: Res<IcoBoard>,
-) {
-    for (mut transform, mut visibility, pos) in &mut query {
-        transform.translation = board.world_position(pos).into();
-        visibility.is_visible = true;
+pub fn item_similarity_update(mut query: Query<(&mut Item, &BoardPosition)>, board: Res<IcoBoard>) {
+    let alpha = ALPHA;
+
+    let item_quantity = query.iter().len();
+    let mut similarities = vec![0.0; item_quantity];
+    for (id, (item, pos)) in query.iter().enumerate() {
+        let mut similarity = 0.0;
+        let adj = board.get_all_adjacent(pos);
+        let s = adj.len() as f64;
+        for other_pos in adj {
+            if let Some(entity) = board.get_cell(&other_pos).item {
+                let (other, _) = query.get(entity).unwrap();
+                similarity += 1. - item.dis(other) / alpha;
+            };
+        }
+        similarities[id] = (similarity / s).max(0.0);
+    }
+
+    for (id, (mut item, _)) in query.iter_mut().enumerate() {
+        item.similarity = similarities[id];
     }
 }
 
-pub fn item_pickup_update(
-    removals: RemovedComponents<BoardPosition>,
-    mut query: Query<&mut Visibility>,
+pub fn item_position_update(
+    mut query: Query<(&mut Transform, &BoardPosition), (Changed<BoardPosition>, With<Item>)>,
+    board: Res<IcoBoard>,
 ) {
-    for entity in removals.iter() {
-        let mut visibility = query.get_mut(entity).unwrap_or_else(|_| {
-            let error_message = "Could not find BoardEntity with removed BoardPosition";
-            error!("{error_message}");
-            panic!("{error_message}");
-        });
-        visibility.is_visible = false;
+    for (mut transform, pos) in &mut query {
+        transform.translation = board.world_position(pos).into();
     }
 }
