@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::utils::HashMap;
 use bevy_mod_picking::{PickableBundle, PickingEvent};
 use rand::Rng;
 
@@ -7,7 +8,7 @@ use crate::consts::{ALPHA, ITEM_RADIUS, ITEM_SUBDIVISIONS};
 use crate::dataset::{Dataset, DatasetHandle};
 use crate::{BoardPosition, IcoBoard};
 
-#[derive(Component)]
+#[derive(Debug, Component)]
 pub struct Item {
     pub similarity: f64,
     pub data: [f32; 2],
@@ -104,26 +105,27 @@ pub fn item_spawn_on_dataset_load(
     }
 }
 
-pub fn item_similarity_update(mut query: Query<(&mut Item, &BoardPosition)>, board: Res<IcoBoard>) {
-    let alpha = ALPHA;
-
+pub fn item_similarity_update(
+    mut query: Query<(Entity, &mut Item, &BoardPosition)>,
+    board: Res<IcoBoard>,
+) {
     let item_quantity = query.iter().len();
-    let mut similarities = vec![0.0; item_quantity];
-    for (id, (item, pos)) in query.iter().enumerate() {
+    let mut similarities = HashMap::with_capacity(item_quantity);
+    for (entity, item, pos) in query.iter() {
         let mut similarity = 0.0;
         let adj = board.get_all_adjacent(pos);
         let s = adj.len() as f64;
         for other_pos in adj {
             if let Some(entity) = board.get_cell(&other_pos).item {
-                let (other, _) = query.get(entity).unwrap();
-                similarity += 1. - item.dis(other) / alpha;
+                let (_, other, _) = query.get(entity).unwrap();
+                similarity += 1. - item.dis(other) / ALPHA;
             };
         }
-        similarities[id] = (similarity / s).max(0.0);
+        similarities.insert(entity, (similarity / s).max(0.0));
     }
 
-    for (id, (mut item, _)) in query.iter_mut().enumerate() {
-        item.similarity = similarities[id];
+    for (entity, mut item, _) in query.iter_mut() {
+        item.similarity = *similarities.get(&entity).unwrap();
     }
 }
 
@@ -136,11 +138,12 @@ pub fn item_position_update(
     }
 }
 
-pub fn print_on_pick(mut events: EventReader<PickingEvent>, query: Query<&Item>) {
+pub fn print_on_pick(mut events: EventReader<PickingEvent>, query: Query<(&Item)>) {
     for ev in events.iter() {
         match ev {
             PickingEvent::Clicked(entity) => {
-                info!("Similarity {:?}", query.get(*entity).unwrap().similarity)
+                let (item) = query.get(*entity).unwrap();
+                info!("{:?}", item);
             }
             _ => (),
         }

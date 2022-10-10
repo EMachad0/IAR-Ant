@@ -1,15 +1,13 @@
 use plotters::prelude::*;
 
 pub fn pickup_probability(similarity: f64) -> f64 {
-    let k1 = 0.1;
-    let p = k1 / (k1 + similarity);
-    p * p
+    let k1 = 100. / 50.;
+    1. - (similarity * k1).min(1.0)
 }
 
 pub fn drop_probability(similarity: f64) -> f64 {
-    let k2 = 1.0;
-    let p = similarity / (k2 + similarity);
-    p * p
+    let k2 = 100. / 50.;
+    (similarity * k2).min(1.0)
 }
 
 pub fn draw_probability_function() {
