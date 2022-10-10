@@ -12,7 +12,7 @@ pub const ANT_COUNT: usize = 100;
 pub const ANT_RADIUS: f32 = 0.06;
 pub const ANT_HEIGHT: f32 = 0.2;
 
-// Food
+// Item
 pub const ITEM_SUBDIVISIONS: usize = 2;
 pub const ITEM_RADIUS: f32 = 0.2;
 
@@ -20,4 +20,4 @@ pub const ITEM_RADIUS: f32 = 0.2;
 pub const SUN_DISTANCE: f32 = 9.0;
 
 // Probability
-pub const ALPHA: f64 = 5.;
+pub const ALPHA: f64 = 4.5;

@@ -10,6 +10,7 @@ use bevy::pbr::wireframe::WireframePlugin;
 use bevy::prelude::*;
 use bevy::render::settings::{WgpuFeatures, WgpuSettings};
 use bevy::window::PresentMode;
+use bevy_mod_picking::DefaultPickingPlugins;
 use iyes_loopless::prelude::*;
 use std::time::Duration;
 
@@ -52,6 +53,7 @@ fn main() {
         )
         // Plugins
         .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPickingPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(LightPlugin)
@@ -98,6 +100,7 @@ fn main() {
         .add_system(simulation::control::simulation_ending_input_handler)
         .add_system(simulation::control::wireframe_input_handler)
         .add_system(timestep::control::timestep_input_handler)
+        .add_system(simulation::item::print_on_pick)
         // Run
         .run();
 }

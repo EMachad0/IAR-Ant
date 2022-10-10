@@ -1,6 +1,7 @@
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
 use bevy::render::camera::Projection;
+use bevy_mod_picking::PickingCameraBundle;
 
 use crate::consts::CAMERA_DISTANCE;
 
@@ -135,10 +136,12 @@ fn spawn_camera(mut commands: Commands) {
     let radius = translation.length();
 
     commands
-        .spawn_bundle(Camera3dBundle {
+        .spawn()
+        .insert_bundle(Camera3dBundle {
             transform: Transform::from_translation(translation).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
+        .insert_bundle(PickingCameraBundle::default())
         .insert(PanOrbitCamera {
             radius,
             ..Default::default()

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_mod_picking::{PickableBundle, PickingEvent};
 use rand::Rng;
 
 use super::group_colors::HIGH_CONTRAST_COLORS;
@@ -90,6 +91,7 @@ pub fn item_spawn_on_dataset_load(
                                 similarity: 0.0,
                                 data: *data,
                             })
+                            .insert_bundle(PickableBundle::default())
                             .insert(pos)
                             .id();
 
@@ -131,5 +133,16 @@ pub fn item_position_update(
 ) {
     for (mut transform, pos) in &mut query {
         transform.translation = board.world_position(pos).into();
+    }
+}
+
+pub fn print_on_pick(mut events: EventReader<PickingEvent>, query: Query<&Item>) {
+    for ev in events.iter() {
+        match ev {
+            PickingEvent::Clicked(entity) => {
+                info!("Similarity {:?}", query.get(*entity).unwrap().similarity)
+            }
+            _ => (),
+        }
     }
 }
