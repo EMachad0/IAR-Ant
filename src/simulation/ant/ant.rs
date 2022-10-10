@@ -5,6 +5,7 @@ use rand::Rng;
 use crate::consts::{ANT_COUNT, ANT_HEIGHT, ANT_RADIUS, BOARD_RADIUS};
 use crate::simulation::ant::{drop_probability, pickup_probability};
 use crate::simulation::board::BoardPosition;
+use crate::simulation::item;
 use crate::simulation::item::Item;
 use crate::{IcoBoard, SimulationStatus};
 
@@ -76,9 +77,10 @@ pub fn ant_move(
 
 pub fn ant_pickup_drop(
     status: Res<SimulationStatus>,
-    mut query: Query<(&BoardPosition, &mut Ant)>,
-    mut item_query: Query<(&Item, &mut Visibility)>,
     mut board: ResMut<IcoBoard>,
+    mut query: Query<(&BoardPosition, &mut Ant)>,
+    item_query: Query<&Item>,
+    mut visibility_query: Query<&mut Visibility, With<Item>>,
 ) {
     let mut rng = rand::thread_rng();
     for (pos, mut ant) in &mut query {
@@ -88,15 +90,19 @@ pub fn ant_pickup_drop(
                     continue;
                 }
 
-                let (item, mut visibility) = item_query.get_mut(entity).unwrap();
-                if rng.gen_bool(pickup_probability(item.similarity)) {
+                let similarity = item::compute_similarity(entity, pos, &board, &item_query);
+
+                if rng.gen_bool(pickup_probability(similarity)) {
+                    let mut visibility = visibility_query.get_mut(entity).unwrap();
                     visibility.is_visible = false;
                     ant.item = board.get_cell_mut(pos).item.take();
                 }
             }
             (None, Some(entity)) => {
-                let (item, mut visibility) = item_query.get_mut(entity).unwrap();
-                if rng.gen_bool(drop_probability(item.similarity)) {
+                let similarity = item::compute_similarity(entity, pos, &board, &item_query);
+
+                if rng.gen_bool(drop_probability(similarity)) {
+                    let mut visibility = visibility_query.get_mut(entity).unwrap();
                     visibility.is_visible = true;
                     board.get_cell_mut(pos).item = ant.item.take();
                 }

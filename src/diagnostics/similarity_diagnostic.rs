@@ -2,7 +2,9 @@ use bevy::diagnostic::{Diagnostic, DiagnosticId, Diagnostics};
 use bevy::prelude::*;
 
 use crate::dataset::{Dataset, DatasetHandle};
+use crate::simulation::item;
 use crate::simulation::item::Item;
+use crate::{BoardPosition, IcoBoard};
 
 #[derive(Default)]
 pub struct SimilarityDiagnosticsPlugin;
@@ -42,9 +44,15 @@ impl SimilarityDiagnosticsPlugin {
         }
     }
 
-    pub fn diagnostic_system(mut diagnostics: ResMut<Diagnostics>, query: Query<&Item>) {
-        query.iter().for_each(|item| {
-            diagnostics.add_measurement(Self::SIMILARITY, || item.similarity);
-        });
+    pub fn diagnostic_system(
+        mut diagnostics: ResMut<Diagnostics>,
+        query: Query<(Entity, &BoardPosition), With<Item>>,
+        item_query: Query<&Item>,
+        board: Res<IcoBoard>,
+    ) {
+        for (entity, pos) in &query {
+            let similarity = item::compute_similarity(entity, pos, &*board, &item_query);
+            diagnostics.add_measurement(Self::SIMILARITY, || similarity);
+        }
     }
 }

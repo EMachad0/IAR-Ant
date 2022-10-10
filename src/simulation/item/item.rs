@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::utils::HashMap;
 use bevy_mod_picking::{PickableBundle, PickingEvent};
 use rand::Rng;
 
@@ -10,7 +9,6 @@ use crate::{BoardPosition, IcoBoard};
 
 #[derive(Debug, Component)]
 pub struct Item {
-    pub similarity: f64,
     pub data: [f32; 2],
 }
 
@@ -88,10 +86,7 @@ pub fn item_spawn_on_dataset_load(
                                 },
                                 ..default()
                             })
-                            .insert(Item {
-                                similarity: 0.0,
-                                data: *data,
-                            })
+                            .insert(Item { data: *data })
                             .insert_bundle(PickableBundle::default())
                             .insert(pos)
                             .id();
@@ -105,28 +100,22 @@ pub fn item_spawn_on_dataset_load(
     }
 }
 
-pub fn item_similarity_update(
-    mut query: Query<(Entity, &mut Item, &BoardPosition)>,
-    board: Res<IcoBoard>,
-) {
-    let item_quantity = query.iter().len();
-    let mut similarities = HashMap::with_capacity(item_quantity);
-    for (entity, item, pos) in query.iter() {
-        let mut similarity = 0.0;
-        let adj = board.get_all_adjacent(pos);
-        let s = adj.len() as f64;
-        for other_pos in adj {
-            if let Some(entity) = board.get_cell(&other_pos).item {
-                let (_, other, _) = query.get(entity).unwrap();
-                similarity += 1. - item.dis(other) / ALPHA;
-            };
-        }
-        similarities.insert(entity, (similarity / s).max(0.0));
-    }
-
-    for (entity, mut item, _) in query.iter_mut() {
-        item.similarity = *similarities.get(&entity).unwrap();
-    }
+pub fn compute_similarity(
+    entity: Entity,
+    pos: &BoardPosition,
+    board: &IcoBoard,
+    item_query: &Query<&Item>,
+) -> f64 {
+    let item = item_query.get(entity).expect("Expect entity to be an Item");
+    let s = board.get_all_adjacent(pos).len() as f64;
+    let sum: f64 = board
+        .get_all_adjacent(pos)
+        .iter()
+        .filter_map(|other_pos| board.get_cell(other_pos).item)
+        .map(|entity| item_query.get(entity).unwrap())
+        .map(|other| 1. - item.dis(other) / ALPHA)
+        .sum();
+    (sum / s).max(0.0)
 }
 
 pub fn item_position_update(

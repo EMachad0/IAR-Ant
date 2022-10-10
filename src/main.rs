@@ -84,11 +84,7 @@ fn main() {
             stage
                 .get_system_stage(2)
                 .add_system(simulation::control::auto_pause)
-                .add_system(simulation::ant::ant_carried_item_position_update)
-                .add_system(
-                    simulation::item::item_similarity_update
-                        .after(simulation::ant::ant_carried_item_position_update),
-                );
+                .add_system(simulation::ant::ant_carried_item_position_update);
             stage
         })
         // Per Frame Systems
