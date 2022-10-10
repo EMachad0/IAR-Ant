@@ -138,11 +138,11 @@ pub fn item_position_update(
     }
 }
 
-pub fn print_on_pick(mut events: EventReader<PickingEvent>, query: Query<(&Item)>) {
+pub fn print_on_pick(mut events: EventReader<PickingEvent>, query: Query<&Item>) {
     for ev in events.iter() {
         match ev {
             PickingEvent::Clicked(entity) => {
-                let (item) = query.get(*entity).unwrap();
+                let item = query.get(*entity).unwrap();
                 info!("{:?}", item);
             }
             _ => (),

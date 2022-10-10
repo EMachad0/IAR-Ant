@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 mod data;
 
+use crate::consts::DATASET_PATH;
 pub use data::*;
 
 pub struct DatasetPlugin;
@@ -19,6 +20,6 @@ impl Plugin for DatasetPlugin {
 pub struct DatasetHandle(Handle<Dataset>);
 
 pub fn load_dataset(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let handle = asset_server.load("dataset/dataset_04.txt");
+    let handle = asset_server.load(DATASET_PATH);
     commands.insert_resource(DatasetHandle(handle));
 }

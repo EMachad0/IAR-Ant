@@ -19,5 +19,10 @@ pub const ITEM_RADIUS: f32 = 0.2;
 // Light
 pub const SUN_DISTANCE: f32 = 9.0;
 
-// Probability
-pub const ALPHA: f64 = 10.0;
+// Dataset 04
+// pub const DATASET_PATH: &str = "dataset/dataset_04.txt";
+// pub const ALPHA: f64 = 10.0;
+
+// Dataset 15
+pub const DATASET_PATH: &str = "dataset/dataset_15.txt";
+pub const ALPHA: f64 = 1.5;
