@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::reflect::FromReflect;
 use bevy_inspector_egui::Inspectable;
 
-#[derive(Default, Debug, Copy, Clone, PartialEq, Component, Deref, Reflect, FromReflect, Inspectable)]
+#[derive(Default, Debug, Copy, Clone, Component, Deref, Reflect, FromReflect, Inspectable)]
 #[reflect(Component)]
 pub struct BoardPosition(usize);
 

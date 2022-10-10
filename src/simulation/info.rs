@@ -1,5 +1,5 @@
-use core::time::Duration;
 use bevy::prelude::*;
+use core::time::Duration;
 
 use crate::timestep::FixedTimestepInfo;
 

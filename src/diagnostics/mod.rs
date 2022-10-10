@@ -1,7 +1,7 @@
+pub mod similarity_diagnostic;
 pub mod simulation_time_diagnostic;
 mod text;
 pub mod timestep_diagnostic;
-pub mod similarity_diagnostic;
 
 #[allow(unused_imports)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
@@ -10,9 +10,9 @@ use iyes_loopless::prelude::*;
 
 use crate::simulation::control::is_simulation_paused_or_ending;
 use crate::timestep::{FixedTimestepStage, FixedUpdateLabel};
+use similarity_diagnostic::SimilarityDiagnosticsPlugin;
 use simulation_time_diagnostic::SimulationTimeDiagnosticsPlugin;
 use timestep_diagnostic::TimeStepDiagnosticsPlugin;
-use similarity_diagnostic::SimilarityDiagnosticsPlugin;
 
 pub struct SimulationDiagnosticsPlugin;
 
