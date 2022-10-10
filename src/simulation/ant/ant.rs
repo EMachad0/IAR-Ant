@@ -71,7 +71,7 @@ pub fn ant_move(
         if status.ending && ant.item.is_none() {
             continue;
         }
-        *pos = board.get_random_adjacent(&pos);
+        *pos = *board.get_random_adjacent(&pos);
     }
 }
 

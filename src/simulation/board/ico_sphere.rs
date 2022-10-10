@@ -15,9 +15,8 @@ pub struct BoardSphere;
 #[derive(Debug, Default, Clone, Reflect, Inspectable)]
 #[reflect(Resource)]
 pub struct IcoBoard {
-    pub adj: Vec<Vec<usize>>,
+    pub adj: Vec<Vec<BoardPosition>>,
     pub vertex: Vec<[f32; 3]>,
-    pub indices: Vec<u32>,
     pub cells: Vec<Cell>,
 }
 
@@ -44,17 +43,13 @@ impl IcoBoard {
         self.vertex[pos.idx()]
     }
 
-    pub fn get_all_adjacent(&self, pos: &BoardPosition) -> Vec<BoardPosition> {
-        self.adj[pos.idx()]
-            .iter()
-            .map(|f| BoardPosition::new(*f))
-            .collect()
+    pub fn get_all_adjacent(&self, pos: &BoardPosition) -> &Vec<BoardPosition> {
+        &self.adj[pos.idx()]
     }
 
-    pub fn get_random_adjacent(&self, pos: &BoardPosition) -> BoardPosition {
+    pub fn get_random_adjacent(&self, pos: &BoardPosition) -> &BoardPosition {
         let mut rng = rand::thread_rng();
-        let idx = self.adj[pos.idx()].choose(&mut rng).unwrap();
-        BoardPosition::new(*idx)
+        self.adj[pos.idx()].choose(&mut rng).unwrap()
     }
 }
 
@@ -85,7 +80,7 @@ pub fn icosphere_setup(
                 .neighbours(i as u32)
                 .unwrap()
                 .iter()
-                .map(|i| *i as usize)
+                .map(|i| BoardPosition::new(*i as usize))
                 .collect()
         })
         .collect();
@@ -97,7 +92,6 @@ pub fn icosphere_setup(
     commands.insert_resource(IcoBoard {
         adj,
         vertex: vertex.clone(),
-        indices: indices.clone(),
         cells,
     });
 

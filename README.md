@@ -10,11 +10,23 @@ Simulation of Ant based clustering using Rust and Bevy.
 
 ![img.png](assets/img/img_04_1_2.png)
 
+## 4 grupos e raio 2
+
+![img.png](assets/img/img_04_2_1.png)
+
+![img.png](assets/img/img_04_2_2.png)
+
 ## 15 grupos e raio 1
 
 ![img.png](assets/img/img_15_1_1.png)
 
 ![img.png](assets/img/img_15_1_2.png)
+
+## 15 grupos e raio 2
+
+![img.png](assets/img/img_15_2_1.png)
+
+![img.png](assets/img/img_15_2_2.png)
 
 ## Probability Function
 

@@ -74,13 +74,18 @@ fn main() {
                 simulation::info::simulation_info_update
                     .run_if_not(simulation::control::is_simulation_paused_or_ending),
             );
-            stage.get_system_stage(1).add_system_set(
-                ConditionSet::new()
-                    .run_if_not(simulation::control::is_simulation_paused)
-                    .with_system(simulation::ant::ant_move)
-                    .with_system(simulation::ant::ant_pickup_drop)
-                    .into(),
-            );
+            stage
+                .get_system_stage(1)
+                .add_system(
+                    simulation::ant::ant_pickup_drop
+                        .run_if_not(simulation::control::is_simulation_paused)
+                        .before("simulation::ant::ant_move"),
+                )
+                .add_system(
+                    simulation::ant::ant_move
+                        .run_if_not(simulation::control::is_simulation_paused)
+                        .label("simulation::ant::ant_move"),
+                );
             stage
                 .get_system_stage(2)
                 .add_system(simulation::control::auto_pause)
