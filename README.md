@@ -4,20 +4,23 @@ Simulation of Ant based clustering using Rust and Bevy.
 
 ![showcase.png](assets/img/showcase.png)
 
-## Gifs
+## 4 grupos e raio 1
 
-![radius-1.gif](assets/gif/radius_1.gif)
+![img.png](assets/img/img_04_1_1.png)
 
-![radius-2.gif](assets/gif/radius_2.gif)
+![img.png](assets/img/img_04_1_2.png)
 
-![radius-3.gif](assets/gif/radius_3.gif)
+## 15 grupos e raio 1
+
+![img.png](assets/img/img_15_1_1.png)
+
+![img.png](assets/img/img_15_1_2.png)
 
 ## Probability Function
 
-For each entity, the probability to pick up or drop an item is calculated by:
+A probabilidade de pegar e largar items é dada pelas seguinte fórmula encontrada no artigo "Ant-based Clustering Algorithms: A Brief
+Survey" de O.A. Mohamed Jafar e R. Sivakumar
 
-![equation.png](assets/img/equation.png)
+![img.png](assets/img/equation.png)
 
-The plot bellow exemplifies the relation between the ratio of visible items and the probability
-
-![probability_function.png](assets/img/probability_function.png)
+o parametro alpha foi ajustado empiricamente para um valor de 10.0 para a base de 4 grupos e 1.5 para a base de 15 grupos
