@@ -67,6 +67,7 @@ fn pan_orbit_camera(
         orbit_button_changed = true;
     }
 
+    #[allow(unused_variables)]
     for (mut pan_orbit, mut transform, projection) in query.iter_mut() {
         if orbit_button_changed {
             // only check for upside down when orbiting started or ended this frame
