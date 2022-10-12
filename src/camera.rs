@@ -93,18 +93,19 @@ fn pan_orbit_camera(
             transform.rotation = yaw * transform.rotation; // rotate around global y axis
             transform.rotation = transform.rotation * pitch; // rotate around local x axis
         } else if pan.length_squared() > 0.0 {
-            any = true;
+            // Disable pan
+            // any = true;
             // make panning distance independent of resolution and FOV,
-            let window = get_primary_window_size(&windows);
-            if let Projection::Perspective(projection) = projection {
-                pan *= Vec2::new(projection.fov * projection.aspect_ratio, projection.fov) / window;
-            }
+            // let window = get_primary_window_size(&windows);
+            // if let Projection::Perspective(projection) = projection {
+                // pan *= Vec2::new(projection.fov * projection.aspect_ratio, projection.fov) / window;
+            // }
             // translate by local axes
-            let right = transform.rotation * Vec3::X * -pan.x;
-            let up = transform.rotation * Vec3::Y * pan.y;
+            // let right = transform.rotation * Vec3::X * -pan.x;
+            // let up = transform.rotation * Vec3::Y * pan.y;
             // make panning proportional to distance away from focus point
-            let translation = (right + up) * pan_orbit.radius;
-            pan_orbit.focus += translation;
+            // let translation = (right + up) * pan_orbit.radius;
+            // pan_orbit.focus += translation;
         } else if scroll.abs() > 0.0 {
             // Disable zoom
             // any = true;
