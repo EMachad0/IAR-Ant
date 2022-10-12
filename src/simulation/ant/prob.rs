@@ -1,3 +1,4 @@
+#[cfg(not(target_arch = "wasm32"))]
 use plotters::prelude::*;
 
 pub fn pickup_probability(similarity: f64) -> f64 {
@@ -13,6 +14,7 @@ pub fn drop_probability(similarity: f64) -> f64 {
     p.clamp(0.0, 1.0)
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 pub fn draw_probability_function() {
     let root_drawing_area =
         BitMapBackend::new("assets/img/probability_function.png", (1024, 768)).into_drawing_area();
@@ -92,3 +94,6 @@ pub fn draw_probability_function() {
         .draw()
         .unwrap();
 }
+
+#[cfg(target_arch = "wasm32")]
+pub fn draw_probability_function() {}

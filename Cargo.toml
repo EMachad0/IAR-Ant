@@ -7,7 +7,7 @@ default-run = "ant"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.8.1", features = ["dynamic", "bevy_ui", "bevy_text"] }
+bevy = { version = "0.8.1", features = ["bevy_ui", "bevy_text"]}
 bevy-inspector-egui = "0.12.1"
 bevy_mod_picking = "0.9.0"
 hexasphere = { version = "7.2.1", features = ["adjacency"] }

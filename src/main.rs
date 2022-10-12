@@ -28,7 +28,9 @@ use crate::timestep::FixedTimestepStage;
 use crate::timestep::FixedUpdateLabel;
 
 fn main() {
-    App::new()
+    let mut app = App::new();
+
+    app
         // Resources
         .insert_resource(ClearColor(Color::WHITE))
         .insert_resource(WindowDescriptor {
@@ -37,10 +39,6 @@ fn main() {
             height: WINDOW_SIZE,
             resizable: false,
             present_mode: PresentMode::AutoNoVsync,
-            ..default()
-        })
-        .insert_resource(WgpuSettings {
-            features: WgpuFeatures::POLYGON_MODE_LINE,
             ..default()
         })
         .init_resource::<SimulationStatus>()
@@ -99,9 +97,18 @@ fn main() {
         .add_system(simulation::item::item_position_update)
         .add_system(simulation::control::simulation_pause_input_handler)
         .add_system(simulation::control::simulation_ending_input_handler)
-        .add_system(simulation::control::wireframe_input_handler)
         .add_system(timestep::control::timestep_input_handler)
-        .add_system(simulation::item::print_on_pick)
-        // Run
-        .run();
+        .add_system(simulation::item::print_on_pick);
+
+    // Wasm specific
+    if !cfg!(target_arch = "wasm32") {
+        app.insert_resource(WgpuSettings {
+            features: WgpuFeatures::POLYGON_MODE_LINE,
+            ..default()
+        })
+        .add_system(simulation::control::wireframe_input_handler);
+    }
+
+    // Run
+    app.run();
 }
