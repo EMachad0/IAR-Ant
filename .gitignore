@@ -133,3 +133,5 @@ Cargo.lock
 # End of https://www.toptal.com/developers/gitignore/api/clion,rust
 
 .idea
+dist
+dist.zip

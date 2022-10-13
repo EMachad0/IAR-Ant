@@ -16,6 +16,11 @@ plotters = "0.3.4"
 rand = "0.8.5"
 thiserror = "1.0.37"
 
+[features]
+dev = [
+    "bevy/dynamic",
+]
+
 [profile.dev]
 opt-level = 1
 

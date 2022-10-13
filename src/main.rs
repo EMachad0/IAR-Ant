@@ -39,6 +39,7 @@ fn main() {
             height: WINDOW_SIZE,
             resizable: false,
             present_mode: PresentMode::AutoNoVsync,
+            canvas: Some("#bevy".to_string()),
             ..default()
         })
         .init_resource::<SimulationStatus>()
